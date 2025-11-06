@@ -31,9 +31,11 @@ import java.nio.file.Path;
 import java.util.List;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -84,8 +86,9 @@ public class View {
         this.controller = controller;
     }
     private ReadOnlyObjectWrapper<Scene> scene = new ReadOnlyObjectWrapper<>();
+    private ListView<Project> projectList;
 
-    private HBox topBar;
+    /*  private HBox topBar;
     private Button fileButton;
     private ContextMenu fileButtonMenu;
     private MenuItem openFileMenuItem;
@@ -96,8 +99,7 @@ public class View {
     private Tab sourceTab;
     private TextArea sourceEditor;
 
-    private ListView<Project> projectList;
-
+     */
     // private BorderPane borderPane;
     public View(Stage stage, Model model, Controller controller) {
         this.model = model;
@@ -108,34 +110,23 @@ public class View {
     }
 
     private void setupUI() {
-        openFileMenuItem = new MenuItem("Open");
-        openFileMenuItem.setOnAction((event) -> {
-            FileChooser fc = new FileChooser();
-            List<File> selected = fc.showOpenMultipleDialog(stage.getOwner());
-            if (selected == null) {
-                return;
-            }
-            controller.openProjects(Project.fromFiles(selected));
-        });
-        fileButtonMenu = new ContextMenu(openFileMenuItem);
-        fileButton = new Button("Project");
-        fileButton.getStyleClass().add(Styles.FLAT);
 
-        fileButton.setOnAction(t -> {
-            Bounds buttonBounds = fileButton.localToScreen(fileButton.getBoundsInLocal());
-            fileButtonMenu.show(fileButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
-        });
+        var topBar = setupTopBar();
+        var sourceEditor = new TextArea();
+        var sourceTab = new Tab("Source", sourceEditor);
 
-        topBar = new HBox(fileButton);
-        sourceEditor = new TextArea();
-        sourceTab = new Tab("Source", sourceEditor);
-
-        editorPane = new TabPane(sourceTab);
-        editorPane.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
+        var editorPane = new TabPane(sourceTab);
+       /* editorPane.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
             oldVal.setContent(null);
             newVal.setContent(sourceEditor);
+        });*/
+        /*editorPane.getTabs().addListener((ListChangeListener.Change<? extends Tab> change) -> {
+            change.getRemoved().forEach((t) -> {
+                t.se
+            });
         });
-        viewTypeTogglesGroup = new ToggleGroup();
+*/
+        var viewTypeTogglesGroup = new ToggleGroup();
         var sourceOption = new RadioButton("Source");
         sourceOption.setToggleGroup(viewTypeTogglesGroup);
         var visualOption = new RadioButton("Visual");
@@ -169,23 +160,44 @@ public class View {
         );
 
         projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            editorPane.getTabs().add(new Tab("Source", null));
-            System.out.println("hello");
+            editorPane.getTabs().add(new Tab("Source", new TextArea()));
         });
-        projectList.setMinWidth(200);
+        projectList.setMinWidth(250);
         var editorBox = new VBox(viewTypeToggles, editorPane);
         VBox.setVgrow(editorPane, Priority.ALWAYS);
         var verticalDown = new HBox(projectList, editorBox);
         HBox.setHgrow(editorBox, Priority.ALWAYS);
         verticalDown.fillHeightProperty().set(true);
-        projectList.setPrefHeight(2000);
         VBox.setVgrow(verticalDown, Priority.ALWAYS);
+        VBox.setVgrow(projectList, Priority.ALWAYS);
+
         //borderPane = new BorderPane(editorBox, topBar, null, null, projectList);
         var borderPane = new VBox(topBar, verticalDown);
         borderPane.fillWidthProperty().set(true);
         verticalDown.setAlignment(Pos.CENTER);
         scene.set(new Scene(borderPane));
         scene.get().fillProperty().set(Color.RED);
+    }
+
+    private Node setupTopBar() {
+        var openFileMenuItem = new MenuItem("Open");
+        openFileMenuItem.setOnAction((event) -> {
+            FileChooser fc = new FileChooser();
+            List<File> selected = fc.showOpenMultipleDialog(stage.getOwner());
+            if (selected == null) {
+                return;
+            }
+            controller.openProjects(Project.fromFiles(selected));
+        });
+        var fileButtonMenu = new ContextMenu(openFileMenuItem);
+        var fileButton = new Button("Project");
+        fileButton.getStyleClass().add(Styles.FLAT);
+
+        fileButton.setOnAction(t -> {
+            Bounds buttonBounds = fileButton.localToScreen(fileButton.getBoundsInLocal());
+            fileButtonMenu.show(fileButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
+        });
+        return new HBox(fileButton);
     }
 
     private void connectModel() {
@@ -209,9 +221,9 @@ public class View {
     public ReadOnlyProperty<Scene> sceneProperty() {
         return scene.getReadOnlyProperty();
     }
-    
+
     public void openFile(Path file) {
-        
+
     }
 
 }
