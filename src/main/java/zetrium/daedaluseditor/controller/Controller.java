@@ -23,8 +23,6 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor.controller;
 
-import java.io.File;
-import java.util.List;
 import zetrium.daedaluseditor.model.Model;
 import zetrium.daedaluseditor.model.Project;
 
@@ -33,20 +31,20 @@ import zetrium.daedaluseditor.model.Project;
  * @author Tomáš Zídek
  */
 public interface Controller {
-    
+
     void openProject(Project project);
+
     void updateProject(Project project);
+
     default void openProjects(Project... projects) {
         for (Project project : projects) {
             openProject(project);
         }
     }
-    
-    
-    
+
     void sourceEdited(String source);
-    
-    
+
     void setModel(Model model);
+
     Model getModel();
 }
