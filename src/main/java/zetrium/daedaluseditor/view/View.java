@@ -47,6 +47,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -130,10 +131,10 @@ public class View {
         sourceTab = new Tab("Source", sourceEditor);
 
         editorPane = new TabPane(sourceTab);
-editorPane.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
-    oldVal.setContent(null);
-    newVal.setContent(sourceEditor);
-});
+        editorPane.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
+            oldVal.setContent(null);
+            newVal.setContent(sourceEditor);
+        });
         viewTypeTogglesGroup = new ToggleGroup();
         var sourceOption = new RadioButton("Source");
         sourceOption.setToggleGroup(viewTypeTogglesGroup);
@@ -171,20 +172,18 @@ editorPane.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, n
             editorPane.getTabs().add(new Tab("Source", null));
             System.out.println("hello");
         });
+        projectList.setMinWidth(200);
         var editorBox = new VBox(viewTypeToggles, editorPane);
-        editorBox.setPrefHeight(2000);
-        editorBox.setMaxWidth(1000);
-                editorPane.setPrefHeight(2000);
-        editorPane.setMaxWidth(1000);
+        VBox.setVgrow(editorPane, Priority.ALWAYS);
         var verticalDown = new HBox(projectList, editorBox);
-        
+        HBox.setHgrow(editorBox, Priority.ALWAYS);
         verticalDown.fillHeightProperty().set(true);
         projectList.setPrefHeight(2000);
-
+        VBox.setVgrow(verticalDown, Priority.ALWAYS);
         //borderPane = new BorderPane(editorBox, topBar, null, null, projectList);
         var borderPane = new VBox(topBar, verticalDown);
         borderPane.fillWidthProperty().set(true);
-verticalDown.setAlignment(Pos.CENTER);
+        verticalDown.setAlignment(Pos.CENTER);
         scene.set(new Scene(borderPane));
         scene.get().fillProperty().set(Color.RED);
     }
@@ -209,6 +208,10 @@ verticalDown.setAlignment(Pos.CENTER);
 
     public ReadOnlyProperty<Scene> sceneProperty() {
         return scene.getReadOnlyProperty();
+    }
+    
+    public void openFile(Path file) {
+        
     }
 
 }
