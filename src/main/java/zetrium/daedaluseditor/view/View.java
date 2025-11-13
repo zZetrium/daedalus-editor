@@ -112,30 +112,26 @@ public class View {
     private void setupUI() {
 
         var topBar = setupTopBar();
-        var sourceEditor = new TextArea();
-        var sourceTab = new Tab("Source", sourceEditor);
 
-        var editorPane = new TabPane(sourceTab);
-       /* editorPane.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
-            oldVal.setContent(null);
-            newVal.setContent(sourceEditor);
-        });*/
-        /*editorPane.getTabs().addListener((ListChangeListener.Change<? extends Tab> change) -> {
-            change.getRemoved().forEach((t) -> {
-                t.se
-            });
-        });
-*/
-        var viewTypeTogglesGroup = new ToggleGroup();
-        var sourceOption = new RadioButton("Source");
-        sourceOption.setToggleGroup(viewTypeTogglesGroup);
-        var visualOption = new RadioButton("Visual");
-        visualOption.setToggleGroup(viewTypeTogglesGroup);
-        var viewTypeToggles = new HBox(sourceOption, visualOption);
-        visualOption.paddingProperty().set(new Insets(0, 0, 0, 20));
-        sourceOption.paddingProperty().set(new Insets(0, 0, 0, 20));
+        var editorBox = setupEditor();
+        HBox.setHgrow(editorBox, Priority.ALWAYS);
 
-        projectList = new ListView<>();
+        projectList = setupProjectList();
+
+        var verticalDown = new HBox(projectList, editorBox);
+        verticalDown.fillHeightProperty().set(true);
+        verticalDown.setAlignment(Pos.CENTER);
+        VBox.setVgrow(verticalDown, Priority.ALWAYS);
+
+        var borderPane = new VBox(topBar, verticalDown);
+        borderPane.fillWidthProperty().set(true);
+
+        scene.set(new Scene(borderPane));
+        scene.get().fillProperty().set(Color.RED);
+    }
+
+    private ListView<Project> setupProjectList() {
+      var  projectList = new ListView<Project>();
 
         projectList.setCellFactory((param) -> new ListCell<Project>() {
 
@@ -152,6 +148,7 @@ public class View {
                 var pane = new HBox(new FontIcon(Zondicons.FOLDER), new Label(new File(item.getPath()).getName()));
                 //pane.setAlignment(Pos.CENTER);
                 pane.setSpacing(20);
+                pane.setPadding(new Insets(0, 0, 0, 10));
                 var wrapper = new VBox(pane);
                 wrapper.setAlignment(Pos.CENTER);
                 setGraphic(wrapper);
@@ -159,24 +156,10 @@ public class View {
         }
         );
 
-        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            editorPane.getTabs().add(new Tab("Source", new TextArea()));
-        });
         projectList.setMinWidth(250);
-        var editorBox = new VBox(viewTypeToggles, editorPane);
-        VBox.setVgrow(editorPane, Priority.ALWAYS);
-        var verticalDown = new HBox(projectList, editorBox);
-        HBox.setHgrow(editorBox, Priority.ALWAYS);
-        verticalDown.fillHeightProperty().set(true);
-        VBox.setVgrow(verticalDown, Priority.ALWAYS);
         VBox.setVgrow(projectList, Priority.ALWAYS);
 
-        //borderPane = new BorderPane(editorBox, topBar, null, null, projectList);
-        var borderPane = new VBox(topBar, verticalDown);
-        borderPane.fillWidthProperty().set(true);
-        verticalDown.setAlignment(Pos.CENTER);
-        scene.set(new Scene(borderPane));
-        scene.get().fillProperty().set(Color.RED);
+        return projectList;
     }
 
     private Node setupTopBar() {
@@ -198,6 +181,30 @@ public class View {
             fileButtonMenu.show(fileButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
         });
         return new HBox(fileButton);
+    }
+
+    private Node setupEditor() {
+        var editorPane = new TabPane();
+        var viewTypeTogglesGroup = new ToggleGroup();
+        var sourceOption = new RadioButton("Source");
+        sourceOption.setToggleGroup(viewTypeTogglesGroup);
+        var visualOption = new RadioButton("Visual");
+        visualOption.setToggleGroup(viewTypeTogglesGroup);
+        var viewTypeToggles = new HBox(sourceOption, visualOption);
+        visualOption.paddingProperty().set(new Insets(0, 0, 0, 20));
+        sourceOption.paddingProperty().set(new Insets(0, 0, 0, 20));
+        VBox.setVgrow(editorPane, Priority.ALWAYS);
+
+        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
+            editorPane.getTabs().add(new Tab(newVal.projectRootProperty().getName(), new TextArea()));
+        });
+        var editorBox = new VBox(viewTypeToggles, editorPane);
+
+        return editorBox;
+    }
+
+    private Node setupEditTab() {
+        return null;
     }
 
     private void connectModel() {
