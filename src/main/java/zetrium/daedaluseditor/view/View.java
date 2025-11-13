@@ -27,6 +27,7 @@ import atlantafx.base.theme.Styles;
 import zetrium.daedaluseditor.controller.Controller;
 import zetrium.daedaluseditor.model.Model;
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.util.List;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -48,6 +49,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -68,8 +71,7 @@ public class View {
     private Model model;
     private Controller controller;
 
-    private Path selectedFile;
-
+    //private Path selectedFile;
     public Stage getStage() {
         return stage;
     }
@@ -87,6 +89,7 @@ public class View {
     }
     private ReadOnlyObjectWrapper<Scene> scene = new ReadOnlyObjectWrapper<>();
     private ListView<Project> projectList;
+    private TabPane editorPane;
 
     /*  private HBox topBar;
     private Button fileButton;
@@ -112,11 +115,10 @@ public class View {
     private void setupUI() {
 
         var topBar = setupTopBar();
+        projectList = setupProjectList();
 
         var editorBox = setupEditor();
         HBox.setHgrow(editorBox, Priority.ALWAYS);
-
-        projectList = setupProjectList();
 
         var verticalDown = new HBox(projectList, editorBox);
         verticalDown.fillHeightProperty().set(true);
@@ -131,9 +133,21 @@ public class View {
     }
 
     private ListView<Project> setupProjectList() {
-      var  projectList = new ListView<Project>();
+        var projectList = new ListView<Project>();
 
         projectList.setCellFactory((param) -> new ListCell<Project>() {
+            TreeView<Path> projectFiles;
+
+            {
+                projectFiles = new TreeView<>();
+                projectFiles.selectionModelProperty().addListener((o, oldVal, newVal) -> {
+                    //newVal.
+                });
+                    updateSelected(true);
+                
+                // TODO alot of stuff
+                //projectFiles.getSelectionModel().selectedItemProperty().;
+            }
 
             @Override
             protected void updateItem(Project item, boolean empty) {
@@ -144,17 +158,33 @@ public class View {
                     setGraphic(null);
                     return;
                 }
-                //var leftPart = new HBox();
+                /*  //var leftPart = new HBox();
                 var pane = new HBox(new FontIcon(Zondicons.FOLDER), new Label(new File(item.getPath()).getName()));
                 //pane.setAlignment(Pos.CENTER);
                 pane.setSpacing(20);
                 pane.setPadding(new Insets(0, 0, 0, 10));
-                var wrapper = new VBox(pane);
+                var wrapper = new VBox(pane); 
                 wrapper.setAlignment(Pos.CENTER);
-                setGraphic(wrapper);
+                setGraphic(wrapper);*/
+                projectFiles.setRoot(new TreeItem<>(item.getProjectRoot()));
+
+                setGraphic(projectFiles);
+
             }
-        }
-        );
+
+            @Override
+            public void updateSelected(boolean bln) {
+                super.updateSelected(bln);
+                System.out.println("hello");
+                projectFiles.getSelectionModel().clearSelection();
+            }
+
+        });
+        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
+            editorPane.getTabs().add(new Tab(newVal.getProjectRoot().getFileName().toString(), new TextArea()));
+        });
+        projectList.selectionModelProperty().addListener((observable, oldVal, newVal) -> {
+        });
 
         projectList.setMinWidth(250);
         VBox.setVgrow(projectList, Priority.ALWAYS);
@@ -184,7 +214,7 @@ public class View {
     }
 
     private Node setupEditor() {
-        var editorPane = new TabPane();
+        editorPane = new TabPane();
         var viewTypeTogglesGroup = new ToggleGroup();
         var sourceOption = new RadioButton("Source");
         sourceOption.setToggleGroup(viewTypeTogglesGroup);
@@ -195,9 +225,6 @@ public class View {
         sourceOption.paddingProperty().set(new Insets(0, 0, 0, 20));
         VBox.setVgrow(editorPane, Priority.ALWAYS);
 
-        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            editorPane.getTabs().add(new Tab(newVal.projectRootProperty().getName(), new TextArea()));
-        });
         var editorBox = new VBox(viewTypeToggles, editorPane);
 
         return editorBox;

@@ -32,23 +32,22 @@ import javafx.collections.ObservableList;
  */
 public class Model {
 
-    
-    
     // list of opened projects
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
 
     public Model() {
-        projects.addAll(new Project("test"),new Project("test"));
+        projects.addAll(
+                new Project("K:\\public_html\\pexesoconfig.json"),
+                new Project("K:\\public_html\\david.txt"));
     }
-    
+
     /**
      * Returns the list of all currently opened projects.
+     *
      * @return The currently opened projects.
      */
     public ObservableList<Project> getProjects() {
         return projects;
     }
-    
-     
 
 }
