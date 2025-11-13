@@ -145,7 +145,6 @@ public class View {
                 });
                     updateSelected(true);
                 
-                // TODO alot of stuff
                 //projectFiles.getSelectionModel().selectedItemProperty().;
             }
 
