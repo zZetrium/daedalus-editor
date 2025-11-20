@@ -236,6 +236,30 @@ public class View {
         };
     }
 
+    private TreeCell<ProjectNode> createCell(TreeItem<ProjectNode> item) {
+        return new TreeCell<>() {
+            @Override
+            protected void updateItem(ProjectNode t, boolean empty) {
+                super.updateItem(t, empty);
+                if (empty || t == null) {
+
+                    setText(null);
+
+                    setGraphic(null);
+
+                    return;
+
+                }
+                var icon = new FontIcon(Zondicons.FOLDER);
+                
+                var graphic = new HBox(icon, new Label(t.toString()));
+                graphic.setSpacing(5);
+                setGraphic(graphic);
+            }
+
+        };
+    }
+
     private TreeView<ProjectNode> setupProjectList() {
 
         var projectList = new TreeView<ProjectNode>();
@@ -247,8 +271,11 @@ public class View {
                 root.getChildren().add(createNode(new ProjectNode(p.getProjectRoot())));
             }
             projectList.setRoot(root);
-
         };
+
+        projectList.setCellFactory((p) -> {
+            return createCell(p.getRoot());
+        });
 
         projectList.setMinWidth(250);
         VBox.setVgrow(projectList, Priority.ALWAYS);
