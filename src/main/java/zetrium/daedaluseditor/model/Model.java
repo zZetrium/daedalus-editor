@@ -38,7 +38,7 @@ public class Model {
     public Model() {
         projects.addAll(
                 new Project("K:\\public_html\\pexesoconfig.json"),
-                new Project("K:\\public_html\\david.txt"));
+                new Project("K:\\"));
     }
 
     /**

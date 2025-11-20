@@ -27,12 +27,20 @@ import atlantafx.base.theme.Styles;
 import zetrium.daedaluseditor.controller.Controller;
 import zetrium.daedaluseditor.model.Model;
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -49,6 +57,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
@@ -88,8 +97,11 @@ public class View {
         this.controller = controller;
     }
     private ReadOnlyObjectWrapper<Scene> scene = new ReadOnlyObjectWrapper<>();
-    private ListView<Project> projectList;
+    private TreeView<ProjectNode> projectList;
+
     private TabPane editorPane;
+
+    private ListChangeListener<Project> projectListListener;
 
     /*  private HBox topBar;
     private Button fileButton;
@@ -110,6 +122,7 @@ public class View {
         this.stage = stage;
         setupUI();
         connectModel();
+
     }
 
     private void setupUI() {
@@ -128,62 +141,114 @@ public class View {
         var borderPane = new VBox(topBar, verticalDown);
         borderPane.fillWidthProperty().set(true);
 
+        connectModel();
+
         scene.set(new Scene(borderPane));
         scene.get().fillProperty().set(Color.RED);
     }
 
-    private ListView<Project> setupProjectList() {
-        var projectList = new ListView<Project>();
+    private static class ProjectNode {
 
-        projectList.setCellFactory((param) -> new ListCell<Project>() {
-            TreeView<Path> projectFiles;
+        private Path path;
 
-            {
-                projectFiles = new TreeView<>();
-                projectFiles.selectionModelProperty().addListener((o, oldVal, newVal) -> {
-                    //newVal.
-                });
-                    updateSelected(true);
-                
-                //projectFiles.getSelectionModel().selectedItemProperty().;
-            }
+        public ProjectNode(Path path) {
+            this.path = path;
+        }
+
+        public Path getPath() {
+            return path;
+        }
+
+        public void setPath(Path path) {
+            this.path = path;
+        }
+
+        @Override
+        public String toString() {
+            return path.getFileName() != null ? path.getFileName().toString() : path.toString();
+        }
+
+    }
+
+    private TreeItem<ProjectNode> createNode(final ProjectNode f) {
+        return new TreeItem<ProjectNode>(f) {
+            // We cache whether the ProjectNode is a leaf or not. A ProjectNode is a leaf if
+            // it is not a directory and does not have any files contained within
+            // it. We cache this as isLeaf() is called often, and doing the
+            // actual check on ProjectNode is expensive.
+            private boolean isLeaf;
+
+            // We do the children and leaf testing only once, and then set these
+            // booleans to false so that we do not check again during this
+            // run. A more complete implementation may need to handle more
+            // dynamic file system situations (such as where a folder has files
+            // added after the TreeView is shown). Again, this is left as an
+            // exercise for the reader.
+            private boolean isFirstTimeChildren = true;
+            private boolean isFirstTimeLeaf = true;
 
             @Override
-            protected void updateItem(Project item, boolean empty) {
-                super.updateItem(item, empty);
+            public ObservableList<TreeItem<ProjectNode>> getChildren() {
+                if (isFirstTimeChildren) {
+                    isFirstTimeChildren = false;
 
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                    return;
+                    // First getChildren() call, so we actually go off and
+                    // determine the children of the ProjectNode contained in this TreeItem.
+                    super.getChildren().setAll(buildChildren(this));
                 }
-                /*  //var leftPart = new HBox();
-                var pane = new HBox(new FontIcon(Zondicons.FOLDER), new Label(new File(item.getPath()).getName()));
-                //pane.setAlignment(Pos.CENTER);
-                pane.setSpacing(20);
-                pane.setPadding(new Insets(0, 0, 0, 10));
-                var wrapper = new VBox(pane); 
-                wrapper.setAlignment(Pos.CENTER);
-                setGraphic(wrapper);*/
-                projectFiles.setRoot(new TreeItem<>(item.getProjectRoot()));
-
-                setGraphic(projectFiles);
-
+                return super.getChildren();
             }
 
             @Override
-            public void updateSelected(boolean bln) {
-                super.updateSelected(bln);
-                System.out.println("hello");
-                projectFiles.getSelectionModel().clearSelection();
+            public boolean isLeaf() {
+                if (isFirstTimeLeaf) {
+                    isFirstTimeLeaf = false;
+                    ProjectNode f = (ProjectNode) getValue();
+                    isLeaf = !Files.isDirectory(f.getPath());
+                }
+
+                return isLeaf;
             }
 
-        });
-        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            editorPane.getTabs().add(new Tab(newVal.getProjectRoot().getFileName().toString(), new TextArea()));
-        });
-        projectList.selectionModelProperty().addListener((observable, oldVal, newVal) -> {
-        });
+            private ObservableList<TreeItem<ProjectNode>> buildChildren(TreeItem<ProjectNode> TreeItem) {
+                ProjectNode f = TreeItem.getValue();
+                if (f != null && Files.isDirectory(f.getPath())) {
+                    ProjectNode[] files;
+                    try {
+                        files = Files.list(f.getPath()).map(path -> new ProjectNode(path)).toArray((lenght) -> new ProjectNode[lenght]);
+                    } catch (IOException ex) {
+                        Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+                        return FXCollections.emptyObservableList();
+                    }
+                    if (files != null) {
+                        ObservableList<TreeItem<ProjectNode>> children = FXCollections.observableArrayList();
+
+                        for (ProjectNode childProjectNode : files) {
+                            children.add(createNode(childProjectNode));
+                        }
+
+                        return children;
+                    }
+                }
+
+                return FXCollections.emptyObservableList();
+            }
+        };
+    }
+
+    private TreeView<ProjectNode> setupProjectList() {
+
+        var projectList = new TreeView<ProjectNode>();
+        projectList.showRootProperty().set(false);
+
+        projectListListener = (ListChangeListener.Change<? extends Project> change) -> {
+            TreeItem<ProjectNode> root = new TreeItem<>(null);
+            for (Project p : model.getProjects()) {
+                root.getChildren().add(createNode(new ProjectNode(p.getProjectRoot())));
+            }
+            projectList.setRoot(root);
+
+        };
 
         projectList.setMinWidth(250);
         VBox.setVgrow(projectList, Priority.ALWAYS);
@@ -206,6 +271,7 @@ public class View {
         fileButton.getStyleClass().add(Styles.FLAT);
 
         fileButton.setOnAction(t -> {
+            System.out.println(model.getProjects().toString());
             Bounds buttonBounds = fileButton.localToScreen(fileButton.getBoundsInLocal());
             fileButtonMenu.show(fileButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
         });
@@ -234,7 +300,11 @@ public class View {
     }
 
     private void connectModel() {
-        projectList.setItems(model.getProjects());
+
+        projectListListener.onChanged(null);
+
+        model.getProjects().addListener(projectListListener);
+        //projectList.setItems(model.getProjects());
 
     }
 

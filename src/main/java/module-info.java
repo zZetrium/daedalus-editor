@@ -6,7 +6,7 @@ module zetrium.daedaluseditor {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.zondicons;
     requires org.kordamp.ikonli.javafx;
-    
+    requires java.logging;
     exports zetrium.daedaluseditor;
     exports zetrium.daedaluseditor.controller;
     exports zetrium.daedaluseditor.model;
