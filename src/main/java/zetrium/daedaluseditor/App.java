@@ -48,6 +48,7 @@ public class App extends Application {
         stage.setHeight(400);
         stage.setX(0);
         stage.setY(0);
+        
     }
 
     public static void run() {
