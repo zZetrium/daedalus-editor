@@ -23,8 +23,10 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor.model;
 
+import java.nio.file.Path;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 
 /**
  *
@@ -34,11 +36,11 @@ public class Model {
 
     // list of opened projects
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
+    private final ObservableMap<Path,OpenFile> openedFiles = FXCollections.observableHashMap();
 
     public Model() {
         projects.addAll(
-                new Project("K:\\public_html\\pexesoconfig.json"),
-                new Project("K:\\"));
+                new Project("C:\\Users\\Ryzen\\Documents\\Tom"));
     }
 
     /**
@@ -48,6 +50,15 @@ public class Model {
      */
     public ObservableList<Project> getProjects() {
         return projects;
+    }
+
+    /**
+     * Returns the list of all currently opened files.
+     *
+     * @return The currently opened files.
+     */
+    public ObservableMap<Path,OpenFile> getOpenedFiles() {
+        return openedFiles;
     }
 
 }

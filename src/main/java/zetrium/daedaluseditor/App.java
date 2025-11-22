@@ -23,7 +23,8 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor;
 
-import atlantafx.base.theme.Dracula;
+import atlantafx.base.theme.*;
+
 import zetrium.daedaluseditor.view.View;
 import zetrium.daedaluseditor.controller.ControllerImplementation;
 import zetrium.daedaluseditor.controller.Controller;
@@ -32,16 +33,14 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class App extends Application {
-
+    
     @Override
     public void start(Stage stage) {
-        // Apply AtlantaFX theme globally
-        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
-
+        
         Model m = new Model();
         Controller c = new ControllerImplementation(m, null);
         View v = new View(stage, m, c);
-
+        c.setMessageDisplayer(v);
         stage.setScene(v.getScene());
         stage.show();
         stage.setWidth(800);
@@ -49,10 +48,17 @@ public class App extends Application {
         stage.setX(0);
         stage.setY(0);
         
-    }
+        // Apply AtlantaFX theme globally
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 
+        stage.getScene().getStylesheets().add(
+                getClass().getClassLoader().getResource("fix.css").toExternalForm()
+        );
+        
+    }
+    
     public static void run() {
         launch();
     }
-
+    
 }

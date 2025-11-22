@@ -23,7 +23,9 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor.controller;
 
+import java.nio.file.Path;
 import zetrium.daedaluseditor.model.Model;
+import zetrium.daedaluseditor.model.OpenFile;
 import zetrium.daedaluseditor.model.Project;
 
 /**
@@ -32,19 +34,16 @@ import zetrium.daedaluseditor.model.Project;
  */
 public interface Controller {
 
-    void openProject(Project project);
-
-    void updateProject(Project project);
-
-    default void openProjects(Project... projects) {
-        for (Project project : projects) {
-            openProject(project);
-        }
-    }
-
     void sourceEdited(String source);
 
     void setModel(Model model);
 
     Model getModel();
+     public MessageDisplayer getMessageDisplayer();
+     public void setMessageDisplayer(MessageDisplayer messageDisplayer);
+
+    Path[] listFiles(Path path);
+
+    OpenFile openFile(Path path);
+    
 }

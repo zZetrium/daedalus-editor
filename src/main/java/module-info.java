@@ -4,7 +4,7 @@ module zetrium.daedaluseditor {
     //requires com.fasterxml.jackson.databind;
     requires atlantafx.base;
     requires org.kordamp.ikonli.core;
-    requires org.kordamp.ikonli.zondicons;
+    requires org.kordamp.ikonli.materialdesign2;
     requires org.kordamp.ikonli.javafx;
     requires java.logging;
     exports zetrium.daedaluseditor;

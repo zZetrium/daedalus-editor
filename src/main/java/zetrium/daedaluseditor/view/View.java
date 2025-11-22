@@ -29,24 +29,29 @@ import zetrium.daedaluseditor.model.Model;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -64,21 +69,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Material;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.zondicons.Zondicons;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import zetrium.daedaluseditor.controller.MessageDisplayer;
+import zetrium.daedaluseditor.model.OpenFile;
 import zetrium.daedaluseditor.model.Project;
 
 /**
  *
  * @author Tomáš Zídek
  */
-public class View {
+public class View implements MessageDisplayer{
 
     private Stage stage;
     private Model model;
     private Controller controller;
+    private ObservableMap<OpenFile, Tab> fileTabs = FXCollections.observableHashMap();
 
     //private Path selectedFile;
     public Stage getStage() {
@@ -97,7 +107,7 @@ public class View {
         this.controller = controller;
     }
     private ReadOnlyObjectWrapper<Scene> scene = new ReadOnlyObjectWrapper<>();
-    private TreeView<ProjectNode> projectList;
+    private TreeView<Path> projectList;
 
     private TabPane editorPane;
 
@@ -147,31 +157,13 @@ public class View {
         scene.get().fillProperty().set(Color.RED);
     }
 
-    private static class ProjectNode {
-
-        private Path path;
-
-        public ProjectNode(Path path) {
-            this.path = path;
-        }
-
-        public Path getPath() {
-            return path;
-        }
-
-        public void setPath(Path path) {
-            this.path = path;
-        }
-
-        @Override
-        public String toString() {
-            return path.getFileName() != null ? path.getFileName().toString() : path.toString();
-        }
+    private static String stringify(Path path) {
+        return path.getFileName() != null ? path.getFileName().toString() : path.toString();
 
     }
 
-    private TreeItem<ProjectNode> createNode(final ProjectNode f) {
-        return new TreeItem<ProjectNode>(f) {
+    private TreeItem<Path> createNode(final Path f) {
+        return new TreeItem<Path>(f) {
             // We cache whether the ProjectNode is a leaf or not. A ProjectNode is a leaf if
             // it is not a directory and does not have any files contained within
             // it. We cache this as isLeaf() is called often, and doing the
@@ -188,7 +180,7 @@ public class View {
             private boolean isFirstTimeLeaf = true;
 
             @Override
-            public ObservableList<TreeItem<ProjectNode>> getChildren() {
+            public ObservableList<TreeItem<Path>> getChildren() {
                 if (isFirstTimeChildren) {
                     isFirstTimeChildren = false;
 
@@ -203,27 +195,27 @@ public class View {
             public boolean isLeaf() {
                 if (isFirstTimeLeaf) {
                     isFirstTimeLeaf = false;
-                    ProjectNode f = (ProjectNode) getValue();
-                    isLeaf = !Files.isDirectory(f.getPath());
+                    Path f = (Path) getValue();
+                    isLeaf = !Files.isDirectory(f);
                 }
 
                 return isLeaf;
             }
 
-            private ObservableList<TreeItem<ProjectNode>> buildChildren(TreeItem<ProjectNode> TreeItem) {
-                ProjectNode f = TreeItem.getValue();
-                if (f != null && Files.isDirectory(f.getPath())) {
-                    ProjectNode[] files;
+            private ObservableList<TreeItem<Path>> buildChildren(TreeItem<Path> TreeItem) {
+                Path path = TreeItem.getValue();
+                /*if (path != null && Files.isDirectory(path)) {
+                    Path[] files;
                     try {
-                        files = Files.list(f.getPath()).map(path -> new ProjectNode(path)).toArray((lenght) -> new ProjectNode[lenght]);
+                        files = Files.list(path).toArray((lenght) -> new Path[lenght]);
                     } catch (IOException ex) {
                         Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
                         return FXCollections.emptyObservableList();
                     }
                     if (files != null) {
-                        ObservableList<TreeItem<ProjectNode>> children = FXCollections.observableArrayList();
+                        ObservableList<TreeItem<Path>> children = FXCollections.observableArrayList();
 
-                        for (ProjectNode childProjectNode : files) {
+                        for (Path childProjectNode : files) {
                             children.add(createNode(childProjectNode));
                         }
 
@@ -231,15 +223,23 @@ public class View {
                     }
                 }
 
-                return FXCollections.emptyObservableList();
+                return FXCollections.emptyObservableList();*/
+                Path[] files = controller.listFiles(path);
+                ObservableList<TreeItem<Path>> children = FXCollections.observableArrayList();
+
+                for (Path childProjectNode : files) {
+                    children.add(createNode(childProjectNode));
+                }
+
+                return children;
             }
         };
     }
 
-    private TreeCell<ProjectNode> createCell(TreeItem<ProjectNode> item) {
+    private TreeCell<Path> createCell(TreeItem<Path> item) {
         return new TreeCell<>() {
             @Override
-            protected void updateItem(ProjectNode t, boolean empty) {
+            protected void updateItem(Path t, boolean empty) {
                 super.updateItem(t, empty);
                 if (empty || t == null) {
 
@@ -250,25 +250,34 @@ public class View {
                     return;
 
                 }
-                var icon = new FontIcon(Zondicons.FOLDER);
-                
-                var graphic = new HBox(icon, new Label(t.toString()));
+                var icon = Files.isDirectory(t) ? new FontIcon(MaterialDesignF.FOLDER) : new FontIcon(MaterialDesignF.FILE);
+                var label = new Label(stringify(t));
+                var graphic = new HBox(icon, label);
+                //setScale(label, 0.7);
+                // this.prefWidth(10);
                 graphic.setSpacing(5);
                 setGraphic(graphic);
+                setPrefHeight(20);
             }
 
         };
     }
 
-    private TreeView<ProjectNode> setupProjectList() {
+    private void setScale(Node n, double scale) {
+        n.setScaleX(scale);
+        n.setScaleY(scale);
 
-        var projectList = new TreeView<ProjectNode>();
+    }
+
+    private TreeView<Path> setupProjectList() {
+
+        projectList = new TreeView<Path>();
+        projectList.setFixedCellSize(20);
         projectList.showRootProperty().set(false);
-
         projectListListener = (ListChangeListener.Change<? extends Project> change) -> {
-            TreeItem<ProjectNode> root = new TreeItem<>(null);
+            TreeItem<Path> root = new TreeItem<>(null);
             for (Project p : model.getProjects()) {
-                root.getChildren().add(createNode(new ProjectNode(p.getProjectRoot())));
+                root.getChildren().add(createNode(p.getProjectRoot()));
             }
             projectList.setRoot(root);
         };
@@ -277,10 +286,33 @@ public class View {
             return createCell(p.getRoot());
         });
 
-        projectList.setMinWidth(250);
+        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
+            System.out.println("hello");
+            if (!Files.isDirectory(newVal.getValue())) {
+                openFile(newVal.getValue());
+
+            }
+
+        });
+
+        projectList.setPrefWidth(250);
         VBox.setVgrow(projectList, Priority.ALWAYS);
 
         return projectList;
+    }
+
+    private void openFile(Path p) {
+        OpenFile of = controller.openFile(p);
+        if (of==null) {
+            return;
+        }
+        fileTabs.put(of, new Tab(of.getPath().getFileName().toString(), new Label(of.getCurrentContent())));
+        editorPane.getTabs().add(fileTabs.get(of));
+        selectFile(model.getOpenedFiles().get(p));
+    }
+
+    private void selectFile(OpenFile f) {
+        editorPane.getSelectionModel().select(fileTabs.get(f));
     }
 
     private Node setupTopBar() {
@@ -291,7 +323,7 @@ public class View {
             if (selected == null) {
                 return;
             }
-            controller.openProjects(Project.fromFiles(selected));
+            //controller.openProjects(Project.fromFiles(selected));
         });
         var fileButtonMenu = new ContextMenu(openFileMenuItem);
         var fileButton = new Button("Project");
@@ -316,9 +348,10 @@ public class View {
         visualOption.paddingProperty().set(new Insets(0, 0, 0, 20));
         sourceOption.paddingProperty().set(new Insets(0, 0, 0, 20));
         VBox.setVgrow(editorPane, Priority.ALWAYS);
+        // todo
 
-        var editorBox = new VBox(viewTypeToggles, editorPane);
-
+        var editorBox = new VBox( editorPane);
+        editorBox.setPrefWidth(200);
         return editorBox;
     }
 
@@ -352,8 +385,27 @@ public class View {
         return scene.getReadOnlyProperty();
     }
 
-    public void openFile(Path file) {
+    @Override
+    public void showError(String title,String message) {
+        Alert popup = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
+        popup.setTitle(title);
+        
+        popup.showAndWait();
+    }
 
+    @Override
+    public void showWarning(String message) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public boolean showConfirmation(String message) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void showInformation(String message) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

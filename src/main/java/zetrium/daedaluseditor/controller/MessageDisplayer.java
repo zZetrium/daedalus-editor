@@ -29,7 +29,7 @@ package zetrium.daedaluseditor.controller;
  */
 public interface MessageDisplayer {
 
-    void showError(String message);
+    void showError(String title,String message);
 
     void showWarning(String message);
 

@@ -23,8 +23,19 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor.controller;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 import zetrium.daedaluseditor.model.Model;
+import zetrium.daedaluseditor.model.OpenFile;
 import zetrium.daedaluseditor.model.Project;
+import zetrium.daedaluseditor.view.View;
 
 /**
  *
@@ -41,17 +52,47 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public void openProject(Project project) {
-        model.getProjects().add(project);
-        updateProject(project);
+    public void sourceEdited(String source) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public void updateProject(Project project) {
+    public Path[] listFiles(Path path) {
+        if (path != null && Files.isDirectory(path)) {
+            Path[] files;
+            try {
+                files = Files.list(path).toArray((lenght) -> new Path[lenght]);
+                return files;
+            } catch (IOException ex) {
+                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+                return new Path[0];
+            }
+
+        }
+        return new Path[0];
+    }
+
+    @Override
+    public OpenFile openFile(Path path) {
+        if (model.getOpenedFiles().containsKey(path)) {
+            return model.getOpenedFiles().get(path);
+        }
+        if (Files.isDirectory(path)) {
+            throw new IllegalArgumentException("Path cannot be a directory.");
+        }
+
+        String content;
+        try {
+            content = Files.readString(path);
+            OpenFile of = new OpenFile(path, false, content);
+            model.getOpenedFiles().put(path, of);
+            return of;
+        } catch (IOException ex) {
+            messageDisplayer.showError("Exception occured while loading "+path.toString(),ex.toString());
+            return null;
+        }
 
     }
-    
-
 
     @Override
     public Model getModel() {
@@ -63,17 +104,14 @@ public class ControllerImplementation implements Controller {
         this.model = model;
     }
 
+    @Override
     public MessageDisplayer getMessageDisplayer() {
         return messageDisplayer;
     }
 
+    @Override
     public void setMessageDisplayer(MessageDisplayer messageDisplayer) {
         this.messageDisplayer = messageDisplayer;
-    }
-
-    @Override
-    public void sourceEdited(String source) {
-
     }
 
 }
