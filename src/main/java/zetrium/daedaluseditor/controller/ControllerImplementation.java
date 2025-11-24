@@ -95,6 +95,16 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
+    public Project openProject(Path path) {
+        Project p = new Project(path);
+        model.getProjects().add(p);
+        return p;
+        
+    }
+    
+    
+
+    @Override
     public Model getModel() {
         return model;
     }

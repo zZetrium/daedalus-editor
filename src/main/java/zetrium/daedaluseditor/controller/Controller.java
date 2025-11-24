@@ -46,4 +46,7 @@ public interface Controller {
 
     OpenFile openFile(Path path);
     
+    Project openProject(Path path);
+    
+    
 }

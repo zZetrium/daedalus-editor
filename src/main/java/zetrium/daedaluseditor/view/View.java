@@ -271,10 +271,11 @@ public class View implements MessageDisplayer{
 
     private TreeView<Path> setupProjectList() {
 
-        projectList = new TreeView<Path>();
+        projectList = new TreeView<>();
         projectList.setFixedCellSize(20);
         projectList.showRootProperty().set(false);
         projectListListener = (ListChangeListener.Change<? extends Project> change) -> {
+            System.out.println("hear");
             TreeItem<Path> root = new TreeItem<>(null);
             for (Project p : model.getProjects()) {
                 root.getChildren().add(createNode(p.getProjectRoot()));
@@ -287,7 +288,6 @@ public class View implements MessageDisplayer{
         });
 
         projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            System.out.println("hello");
             if (!Files.isDirectory(newVal.getValue())) {
                 openFile(newVal.getValue());
 
@@ -323,7 +323,7 @@ public class View implements MessageDisplayer{
             if (selected == null) {
                 return;
             }
-            //controller.openProjects(Project.fromFiles(selected));
+            controller.openProjects(Project.fromFiles(selected));
         });
         var fileButtonMenu = new ContextMenu(openFileMenuItem);
         var fileButton = new Button("Project");

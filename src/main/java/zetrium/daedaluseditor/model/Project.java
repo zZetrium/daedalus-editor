@@ -44,6 +44,9 @@ public class Project {
     public Project(String path) {
         projectRoot.setValue(FileSystems.getDefault().getPath(path));
     }
+    public Project(Path path) {
+        projectRoot.setValue(path);
+    }
 
     public static Project[] fromFiles(List<File> files) {
         return fromFiles((File[]) files.toArray());
