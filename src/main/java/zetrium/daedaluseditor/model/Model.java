@@ -40,7 +40,7 @@ public class Model {
 
     public Model() {
         projects.addAll(
-                new Project("C:\\Users\\Ryzen\\Documents\\Tom"));
+                new Project("K:\\Git\\Projects\\daedalus-editor"));
     }
 
     /**

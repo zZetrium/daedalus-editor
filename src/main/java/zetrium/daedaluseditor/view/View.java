@@ -70,6 +70,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -114,8 +115,8 @@ public class View implements MessageDisplayer{
     private ListChangeListener<Project> projectListListener;
 
     /*  private HBox topBar;
-    private Button fileButton;
-    private ContextMenu fileButtonMenu;
+    private Button projectButton;
+    private ContextMenu projectButtonMenu;
     private MenuItem openFileMenuItem;
 
     private TabPane editorPane;
@@ -316,25 +317,34 @@ public class View implements MessageDisplayer{
     }
 
     private Node setupTopBar() {
-        var openFileMenuItem = new MenuItem("Open");
+        var openFileMenuItem = new MenuItem("Open file");
         openFileMenuItem.setOnAction((event) -> {
             FileChooser fc = new FileChooser();
             List<File> selected = fc.showOpenMultipleDialog(stage.getOwner());
             if (selected == null) {
-                return;
+                return; 
             }
-            controller.openProjects(selected.toArray(Path[]::new));
+            controller.openProjects(selected.stream().map(f -> f.toPath()).toArray(Path[]::new));
         });
-        var fileButtonMenu = new ContextMenu(openFileMenuItem);
-        var fileButton = new Button("Project");
-        fileButton.getStyleClass().add(Styles.FLAT);
+        var openDirectoryMenuItem = new MenuItem("Open directory");
+        openDirectoryMenuItem.setOnAction((event) -> {
+            DirectoryChooser fc = new DirectoryChooser();
+            File selected = fc.showDialog(stage.getOwner());
+            if (selected == null) {
+                return; 
+            }
+            controller.openProject(selected.toPath());
+        });
+        var projectButtonMenu = new ContextMenu(openFileMenuItem,openDirectoryMenuItem);
+        var projectButton = new Button("Project");
+        projectButton.getStyleClass().add(Styles.FLAT);
 
-        fileButton.setOnAction(t -> {
+        projectButton.setOnAction(t -> {
             System.out.println(model.getProjects().toString());
-            Bounds buttonBounds = fileButton.localToScreen(fileButton.getBoundsInLocal());
-            fileButtonMenu.show(fileButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
+            Bounds buttonBounds = projectButton.localToScreen(projectButton.getBoundsInLocal());
+            projectButtonMenu.show(projectButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
         });
-        return new HBox(fileButton);
+        return new HBox(projectButton);
     }
 
     private Node setupEditor() {
