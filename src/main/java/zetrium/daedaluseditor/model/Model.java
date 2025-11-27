@@ -36,7 +36,7 @@ public class Model {
 
     // list of opened projects
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
-    private final ObservableMap<Path,OpenFile> openedFiles = FXCollections.observableHashMap();
+    private final ObservableMap<Path, OpenFile> openedFiles = FXCollections.observableHashMap();
 
     public Model() {
         projects.addAll(
@@ -57,8 +57,10 @@ public class Model {
      *
      * @return The currently opened files.
      */
-    public ObservableMap<Path,OpenFile> getOpenedFiles() {
+    public ObservableMap<Path, OpenFile> getOpenedFiles() {
         return openedFiles;
     }
+
+ 
 
 }

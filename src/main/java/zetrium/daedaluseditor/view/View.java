@@ -323,7 +323,7 @@ public class View implements MessageDisplayer{
             if (selected == null) {
                 return;
             }
-            controller.openProjects(Project.fromFiles(selected));
+            controller.openProjects(selected.toArray(Path[]::new));
         });
         var fileButtonMenu = new ContextMenu(openFileMenuItem);
         var fileButton = new Button("Project");

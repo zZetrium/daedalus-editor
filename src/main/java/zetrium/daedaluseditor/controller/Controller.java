@@ -24,6 +24,7 @@
 package zetrium.daedaluseditor.controller;
 
 import java.nio.file.Path;
+import java.util.stream.Stream;
 import zetrium.daedaluseditor.model.Model;
 import zetrium.daedaluseditor.model.OpenFile;
 import zetrium.daedaluseditor.model.Project;
@@ -39,14 +40,23 @@ public interface Controller {
     void setModel(Model model);
 
     Model getModel();
-     public MessageDisplayer getMessageDisplayer();
-     public void setMessageDisplayer(MessageDisplayer messageDisplayer);
+
+    public MessageDisplayer getMessageDisplayer();
+
+    public void setMessageDisplayer(MessageDisplayer messageDisplayer);
 
     Path[] listFiles(Path path);
 
     OpenFile openFile(Path path);
-    
+
     Project openProject(Path path);
-    
-    
+
+    default Project[] openProjects(Path... paths) {
+        Project[] projects = new Project[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            projects[i] = openProject(paths[i]);
+        }
+        return projects;
+    }
+
 }

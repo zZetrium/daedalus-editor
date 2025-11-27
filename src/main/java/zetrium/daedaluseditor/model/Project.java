@@ -48,7 +48,7 @@ public class Project {
         projectRoot.setValue(path);
     }
 
-    public static Project[] fromFiles(List<File> files) {
+    /*public static Project[] fromFiles(List<File> files) {
         return fromFiles((File[]) files.toArray());
     }
 
@@ -58,7 +58,7 @@ public class Project {
             projects[i] = new Project(files[i].getAbsolutePath());
         }
         return projects;
-    }
+    }*/
 
 
     public String getPath() {
