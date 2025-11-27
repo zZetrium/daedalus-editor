@@ -49,7 +49,7 @@ public class App extends Application {
         stage.setY(0);
         
         // Apply AtlantaFX theme globally
-        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
 
         stage.getScene().getStylesheets().add(
                 getClass().getClassLoader().getResource("fix.css").toExternalForm()

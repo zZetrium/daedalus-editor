@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
@@ -65,11 +66,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -83,7 +86,7 @@ import zetrium.daedaluseditor.model.Project;
  *
  * @author Tomáš Zídek
  */
-public class View implements MessageDisplayer{
+public class View implements MessageDisplayer {
 
     private Stage stage;
     private Model model;
@@ -114,8 +117,8 @@ public class View implements MessageDisplayer{
     private ListChangeListener<Project> projectListListener;
 
     /*  private HBox topBar;
-    private Button fileButton;
-    private ContextMenu fileButtonMenu;
+    private Button projectButton;
+    private ContextMenu projectButtonMenu;
     private MenuItem openFileMenuItem;
 
     private TabPane editorPane;
@@ -235,9 +238,16 @@ public class View implements MessageDisplayer{
             }
         };
     }
+    
+    private Consumer<Path> fileSelector = file -> {
+        if (!Files.isDirectory(file)) {
+            openFile(file);
+            
+        }
+    };
 
     private TreeCell<Path> createCell(TreeItem<Path> item) {
-        return new TreeCell<>() {
+        var cell = new TreeCell<Path>() {
             @Override
             protected void updateItem(Path t, boolean empty) {
                 super.updateItem(t, empty);
@@ -261,6 +271,20 @@ public class View implements MessageDisplayer{
             }
 
         };
+
+        cell.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && !cell.isEmpty()) {
+                fileSelector.accept(cell.getItem());
+            }
+        });
+        projectList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                
+                fileSelector.accept(projectList.getSelectionModel().getSelectedItem().getValue());
+            }
+        });
+
+        return cell;
     }
 
     private void setScale(Node n, double scale) {
@@ -287,14 +311,13 @@ public class View implements MessageDisplayer{
             return createCell(p.getRoot());
         });
 
-        projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
+        /*   projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
             if (!Files.isDirectory(newVal.getValue())) {
                 openFile(newVal.getValue());
 
             }
 
-        });
-
+        });*/
         projectList.setPrefWidth(250);
         VBox.setVgrow(projectList, Priority.ALWAYS);
 
@@ -303,7 +326,7 @@ public class View implements MessageDisplayer{
 
     private void openFile(Path p) {
         OpenFile of = controller.openFile(p);
-        if (of==null) {
+        if (of == null) {
             return;
         }
         fileTabs.put(of, new Tab(of.getPath().getFileName().toString(), new Label(of.getCurrentContent())));
@@ -316,25 +339,34 @@ public class View implements MessageDisplayer{
     }
 
     private Node setupTopBar() {
-        var openFileMenuItem = new MenuItem("Open");
+        var openFileMenuItem = new MenuItem("Open file");
         openFileMenuItem.setOnAction((event) -> {
             FileChooser fc = new FileChooser();
             List<File> selected = fc.showOpenMultipleDialog(stage.getOwner());
             if (selected == null) {
                 return;
             }
-            controller.openProjects(selected.toArray(Path[]::new));
+            controller.openProjects(selected.stream().map(f -> f.toPath()).toArray(Path[]::new));
         });
-        var fileButtonMenu = new ContextMenu(openFileMenuItem);
-        var fileButton = new Button("Project");
-        fileButton.getStyleClass().add(Styles.FLAT);
+        var openDirectoryMenuItem = new MenuItem("Open directory");
+        openDirectoryMenuItem.setOnAction((event) -> {
+            DirectoryChooser fc = new DirectoryChooser();
+            File selected = fc.showDialog(stage.getOwner());
+            if (selected == null) {
+                return;
+            }
+            controller.openProject(selected.toPath());
+        });
+        var projectButtonMenu = new ContextMenu(openFileMenuItem, openDirectoryMenuItem);
+        var projectButton = new Button("Project");
+        projectButton.getStyleClass().add(Styles.FLAT);
 
-        fileButton.setOnAction(t -> {
+        projectButton.setOnAction(t -> {
             System.out.println(model.getProjects().toString());
-            Bounds buttonBounds = fileButton.localToScreen(fileButton.getBoundsInLocal());
-            fileButtonMenu.show(fileButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
+            Bounds buttonBounds = projectButton.localToScreen(projectButton.getBoundsInLocal());
+            projectButtonMenu.show(projectButton, buttonBounds.getMinX(), buttonBounds.getMaxY());
         });
-        return new HBox(fileButton);
+        return new HBox(projectButton);
     }
 
     private Node setupEditor() {
@@ -350,7 +382,7 @@ public class View implements MessageDisplayer{
         VBox.setVgrow(editorPane, Priority.ALWAYS);
         // todo
 
-        var editorBox = new VBox( editorPane);
+        var editorBox = new VBox(editorPane);
         editorBox.setPrefWidth(200);
         return editorBox;
     }
@@ -386,10 +418,10 @@ public class View implements MessageDisplayer{
     }
 
     @Override
-    public void showError(String title,String message) {
+    public void showError(String title, String message) {
         Alert popup = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
         popup.setTitle(title);
-        
+
         popup.showAndWait();
     }
 
