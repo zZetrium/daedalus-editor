@@ -10,12 +10,12 @@ import java.nio.file.Path;
  *
  * @author xzidek
  */
-public class OpenFile {
+public class FileState {
     Path path;
     boolean saved;
     String currentContent;
 
-    public OpenFile(Path path, boolean saved, String currentContent) {
+    public FileState( Path path,boolean saved, String currentContent) {
         this.path = path;
         this.saved = saved;
         this.currentContent = currentContent;
@@ -44,6 +44,8 @@ public class OpenFile {
     public void setPath(Path path) {
         this.path = path;
     }
+
+   
 
 
     

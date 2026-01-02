@@ -26,7 +26,7 @@ package zetrium.daedaluseditor.controller;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 import zetrium.daedaluseditor.model.Model;
-import zetrium.daedaluseditor.model.OpenFile;
+import zetrium.daedaluseditor.model.FileState;
 import zetrium.daedaluseditor.model.Project;
 
 /**
@@ -47,9 +47,11 @@ public interface Controller {
 
     Path[] listFiles(Path path);
 
-    OpenFile openFile(Path path);
+    FileState openFile(Path path);
 
     Project openProject(Path path);
+    
+    boolean saveFile(FileState fs);
 
     default Project[] openProjects(Path... paths) {
         Project[] projects = new Project[paths.length];

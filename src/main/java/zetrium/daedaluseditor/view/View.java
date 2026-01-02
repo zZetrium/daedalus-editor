@@ -27,22 +27,17 @@ import atlantafx.base.theme.Styles;
 import zetrium.daedaluseditor.controller.Controller;
 import zetrium.daedaluseditor.model.Model;
 import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
@@ -55,13 +50,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -71,16 +63,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Material;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 import zetrium.daedaluseditor.controller.MessageDisplayer;
-import zetrium.daedaluseditor.model.OpenFile;
+import zetrium.daedaluseditor.model.FileState;
 import zetrium.daedaluseditor.model.Project;
+import javafx.collections.MapChangeListener.Change;
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.TextArea;
+import javafx.util.Pair;
 
 /**
  *
@@ -91,7 +85,8 @@ public class View implements MessageDisplayer {
     private Stage stage;
     private Model model;
     private Controller controller;
-    private ObservableMap<OpenFile, Tab> fileTabs = FXCollections.observableHashMap();
+    private ObservableMap<FileState, FileTab> fileTabs = FXCollections.observableHashMap();
+    //private Pair<FileState, FileTab> selected = new Pair<>(null, null);
 
     //private Path selectedFile;
     public Stage getStage() {
@@ -136,6 +131,18 @@ public class View implements MessageDisplayer {
         setupUI();
         connectModel();
 
+        fileTabs.addListener((Change<? extends FileState, ? extends FileTab> change) -> {
+            if (change.wasRemoved()) {
+                editorPane.getTabs().remove(change.getValueRemoved());
+            }
+            if (change.wasAdded()) {
+                editorPane.getTabs().add(change.getValueAdded());
+            }
+        });
+        
+        /*editorPane.selectionModelProperty().addListener((ObservableValue<? extends SingleSelectionModel<Tab>> observable, SingleSelectionModel<Tab> oldValue, SingleSelectionModel<Tab> newValue) -> {
+            selected = new Pair<>(((FileTab)newValue.getSelectedItem()).getFileState(),(FileTab)newValue.getSelectedItem());
+        });*/
     }
 
     private void setupUI() {
@@ -158,6 +165,7 @@ public class View implements MessageDisplayer {
 
         scene.set(new Scene(borderPane));
         scene.get().fillProperty().set(Color.RED);
+        
     }
 
     private static String stringify(Path path) {
@@ -238,11 +246,11 @@ public class View implements MessageDisplayer {
             }
         };
     }
-    
+
     private Consumer<Path> fileSelector = file -> {
         if (!Files.isDirectory(file)) {
             openFile(file);
-            
+
         }
     };
 
@@ -277,12 +285,7 @@ public class View implements MessageDisplayer {
                 fileSelector.accept(cell.getItem());
             }
         });
-        projectList.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                
-                fileSelector.accept(projectList.getSelectionModel().getSelectedItem().getValue());
-            }
-        });
+        
 
         return cell;
     }
@@ -310,6 +313,12 @@ public class View implements MessageDisplayer {
         projectList.setCellFactory((p) -> {
             return createCell(p.getRoot());
         });
+        projectList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                
+                fileSelector.accept(projectList.getSelectionModel().getSelectedItem().getValue());
+            }
+        });
 
         /*   projectList.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
             if (!Files.isDirectory(newVal.getValue())) {
@@ -325,16 +334,17 @@ public class View implements MessageDisplayer {
     }
 
     private void openFile(Path p) {
-        OpenFile of = controller.openFile(p);
+        FileState of = controller.openFile(p);
         if (of == null) {
             return;
         }
-        fileTabs.put(of, new Tab(of.getPath().getFileName().toString(), new Label(of.getCurrentContent())));
-        editorPane.getTabs().add(fileTabs.get(of));
-        selectFile(model.getOpenedFiles().get(p));
+
+        // fileTabs.put(of, new Tab(of.getPath().getFileName().toString(), new Label(of.getCurrentContent())));
+        //editorPane.getTabs().add(fileTabs.get(of));
+        // selectFile(model.getOpenedFiles().get(p));
     }
 
-    private void selectFile(OpenFile f) {
+    private void selectFile(FileState f) {
         editorPane.getSelectionModel().select(fileTabs.get(f));
     }
 
@@ -376,11 +386,17 @@ public class View implements MessageDisplayer {
         sourceOption.setToggleGroup(viewTypeTogglesGroup);
         var visualOption = new RadioButton("Visual");
         visualOption.setToggleGroup(viewTypeTogglesGroup);
-        var viewTypeToggles = new HBox(sourceOption, visualOption);
+        //var viewTypeToggles = new HBox(sourceOption, visualOption);
         visualOption.paddingProperty().set(new Insets(0, 0, 0, 20));
         sourceOption.paddingProperty().set(new Insets(0, 0, 0, 20));
         VBox.setVgrow(editorPane, Priority.ALWAYS);
         // todo
+        
+        editorPane.setOnKeyPressed(event -> {
+                    if (event.getCode()==KeyCode.S && event.isControlDown()) {
+                        controller.saveFile(((FileTab)editorPane.getSelectionModel().getSelectedItem()).getFileState());
+                    }
+                });
 
         var editorBox = new VBox(editorPane);
         editorBox.setPrefWidth(200);
@@ -394,7 +410,37 @@ public class View implements MessageDisplayer {
     private void connectModel() {
 
         projectListListener.onChanged(null);
+        model.getOpenedFiles().addListener((Change<? extends Path, ? extends FileState> change) -> {
+            if (change.wasAdded() && change.wasRemoved()) {
+                // changed
+                //fileTabs.g
+                var tab = fileTabs.remove(change.getValueRemoved());
+                tab.setFileState(change.getValueAdded());
+                fileTabs.put(change.getValueAdded(), tab);
+                return;
+            }
 
+            if (change.wasRemoved()) {
+                fileTabs.remove(change.getValueRemoved());
+                System.out.println("removed");
+                //editorPane.getTabs().
+            }
+            if (change.wasAdded()) {
+                System.out.println("added");
+                var textArea = new TextArea(change.getValueAdded().getCurrentContent());
+                
+                var tab =  new FileTab(
+                                change.getValueAdded().getPath().getFileName().toString(),
+                                textArea,
+                                change.getValueAdded());
+                textArea.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                    tab.getFileState().setCurrentContent(textArea.getText());
+                });
+                fileTabs.put(
+                        change.getValueAdded(),
+                       tab);
+            }
+        });
         model.getProjects().addListener(projectListListener);
         //projectList.setItems(model.getProjects());
 

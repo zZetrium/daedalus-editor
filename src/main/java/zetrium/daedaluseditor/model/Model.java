@@ -36,11 +36,11 @@ public class Model {
 
     // list of opened projects
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
-    private final ObservableMap<Path, OpenFile> openedFiles = FXCollections.observableHashMap();
+    private final ObservableMap<Path, FileState> openedFiles = FXCollections.observableHashMap();
 
     public Model() {
         projects.addAll(
-                new Project("K:\\Git\\Projects\\daedalus-editor"));
+                new Project("C:\\Users\\Ryzen\\Documents\\Tom\\Lua"));
     }
 
     /**
@@ -57,10 +57,8 @@ public class Model {
      *
      * @return The currently opened files.
      */
-    public ObservableMap<Path, OpenFile> getOpenedFiles() {
+    public ObservableMap<Path, FileState> getOpenedFiles() {
         return openedFiles;
     }
-
- 
 
 }

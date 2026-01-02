@@ -27,13 +27,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import zetrium.daedaluseditor.model.Model;
-import zetrium.daedaluseditor.model.OpenFile;
+import zetrium.daedaluseditor.model.FileState;
 import zetrium.daedaluseditor.model.Project;
 import zetrium.daedaluseditor.view.View;
 
@@ -73,7 +74,7 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public OpenFile openFile(Path path) {
+    public FileState openFile(Path path) {
         if (model.getOpenedFiles().containsKey(path)) {
             return model.getOpenedFiles().get(path);
         }
@@ -84,11 +85,11 @@ public class ControllerImplementation implements Controller {
         String content;
         try {
             content = Files.readString(path);
-            OpenFile of = new OpenFile(path, false, content);
-            model.getOpenedFiles().put(path, of);
+            FileState of = new FileState( path,false, content);
+            model.getOpenedFiles().put(path,of);
             return of;
         } catch (IOException ex) {
-            messageDisplayer.showError("Exception occured while loading "+path.toString(),ex.toString());
+            messageDisplayer.showError(ex.toString(),"Exception occured while loading "+path.toString());
             return null;
         }
 
@@ -122,6 +123,19 @@ public class ControllerImplementation implements Controller {
     @Override
     public void setMessageDisplayer(MessageDisplayer messageDisplayer) {
         this.messageDisplayer = messageDisplayer;
+    }
+
+    @Override
+    public boolean saveFile(FileState fs) {
+        try {
+            Files.writeString(fs.getPath(), fs.getCurrentContent());
+        } catch (IOException ex) {
+            //System.getLogger(ControllerImplementation.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            messageDisplayer.showError(ex.toString(), "Writing to "+fs.getPath().toString()+" failed");
+            return false;
+        }
+        fs.setSaved(true);
+        return true;
     }
 
 }
