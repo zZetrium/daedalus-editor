@@ -33,21 +33,22 @@ import java.util.function.Function;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
-public class JsonObject extends JsonNode implements Map<String,JsonNode>{
-    Map<String,JsonNode> children;
+public class JsonObject extends JsonElement implements Map<String, JsonElement> {
 
-    public JsonObject() {
-        this.children = new HashMap();
-    }
+    Map<String, JsonElement> children;
 
-    public JsonObject(Map<String, JsonNode> children) {
+    public JsonObject(Map<String, JsonElement> children, int startOffset, int endOffset, int precedingWs) {
+        super(startOffset, endOffset, precedingWs);
         this.children = children;
     }
+
     
-    
-    
+
+    public JsonObject(int startOffset, int endOffset, int precedingWs) {
+        this(new HashMap<>(), startOffset, endOffset,  precedingWs);
+    }
 
     @Override
     public int size() {
@@ -70,22 +71,22 @@ public class JsonObject extends JsonNode implements Map<String,JsonNode>{
     }
 
     @Override
-    public JsonNode get(Object key) {
+    public JsonElement get(Object key) {
         return children.get(key);
     }
 
     @Override
-    public JsonNode put(String key, JsonNode value) {
+    public JsonElement put(String key, JsonElement value) {
         return children.put(key, value);
     }
 
     @Override
-    public JsonNode remove(Object key) {
+    public JsonElement remove(Object key) {
         return children.remove(key);
     }
 
     @Override
-    public void putAll(Map<? extends String, ? extends JsonNode> m) {
+    public void putAll(Map<? extends String, ? extends JsonElement> m) {
         children.putAll(m);
     }
 
@@ -100,12 +101,12 @@ public class JsonObject extends JsonNode implements Map<String,JsonNode>{
     }
 
     @Override
-    public Collection<JsonNode> values() {
+    public Collection<JsonElement> values() {
         return children.values();
     }
 
     @Override
-    public Set<Entry<String, JsonNode>> entrySet() {
+    public Set<Entry<String, JsonElement>> entrySet() {
         return children.entrySet();
     }
 
@@ -120,22 +121,22 @@ public class JsonObject extends JsonNode implements Map<String,JsonNode>{
     }
 
     @Override
-    public JsonNode getOrDefault(Object key, JsonNode defaultValue) {
+    public JsonElement getOrDefault(Object key, JsonElement defaultValue) {
         return children.getOrDefault(key, defaultValue);
     }
 
     @Override
-    public void forEach(BiConsumer<? super String, ? super JsonNode> action) {
+    public void forEach(BiConsumer<? super String, ? super JsonElement> action) {
         children.forEach(action);
     }
 
     @Override
-    public void replaceAll(BiFunction<? super String, ? super JsonNode, ? extends JsonNode> function) {
+    public void replaceAll(BiFunction<? super String, ? super JsonElement, ? extends JsonElement> function) {
         children.replaceAll(function);
     }
 
     @Override
-    public JsonNode putIfAbsent(String key, JsonNode value) {
+    public JsonElement putIfAbsent(String key, JsonElement value) {
         return children.putIfAbsent(key, value);
     }
 
@@ -145,35 +146,33 @@ public class JsonObject extends JsonNode implements Map<String,JsonNode>{
     }
 
     @Override
-    public boolean replace(String key, JsonNode oldValue, JsonNode newValue) {
+    public boolean replace(String key, JsonElement oldValue, JsonElement newValue) {
         return children.replace(key, oldValue, newValue);
     }
 
     @Override
-    public JsonNode replace(String key, JsonNode value) {
+    public JsonElement replace(String key, JsonElement value) {
         return children.replace(key, value);
     }
 
     @Override
-    public JsonNode computeIfAbsent(String key, Function<? super String, ? extends JsonNode> mappingFunction) {
+    public JsonElement computeIfAbsent(String key, Function<? super String, ? extends JsonElement> mappingFunction) {
         return children.computeIfAbsent(key, mappingFunction);
     }
 
     @Override
-    public JsonNode computeIfPresent(String key, BiFunction<? super String, ? super JsonNode, ? extends JsonNode> remappingFunction) {
+    public JsonElement computeIfPresent(String key, BiFunction<? super String, ? super JsonElement, ? extends JsonElement> remappingFunction) {
         return children.computeIfPresent(key, remappingFunction);
     }
 
     @Override
-    public JsonNode compute(String key, BiFunction<? super String, ? super JsonNode, ? extends JsonNode> remappingFunction) {
+    public JsonElement compute(String key, BiFunction<? super String, ? super JsonElement, ? extends JsonElement> remappingFunction) {
         return children.compute(key, remappingFunction);
     }
 
     @Override
-    public JsonNode merge(String key, JsonNode value, BiFunction<? super JsonNode, ? super JsonNode, ? extends JsonNode> remappingFunction) {
+    public JsonElement merge(String key, JsonElement value, BiFunction<? super JsonElement, ? super JsonElement, ? extends JsonElement> remappingFunction) {
         return children.merge(key, value, remappingFunction);
     }
 
-    
-    
 }

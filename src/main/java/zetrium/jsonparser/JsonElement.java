@@ -25,8 +25,37 @@ package zetrium.jsonparser;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
-public class JsonNode {
+public class JsonElement {
+    private int startOffset;
+    private int endOffset;
+    private int precedingWs;
+
+    public JsonElement(int startOffset, int endOffset, int precedingWs) {
+        this.startOffset = startOffset;
+        this.endOffset = endOffset;
+        this.precedingWs = precedingWs;
+    }
+
+    
+    
+    
+
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
+    }
+
+    public int getEndOffset() {
+        return endOffset;
+    }
+
+    public void setEndOffset(int endOffset) {
+        this.endOffset = endOffset;
+    }
     
 }

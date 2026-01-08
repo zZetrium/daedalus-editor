@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 
 /**
  *
- * @author xzidek
+ * @author Tomáš Zídek
  */
 public interface PathPredicate extends Predicate<Path> {
 

@@ -31,7 +31,7 @@ import zetrium.daedaluseditor.model.FileState;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
 public class FileTab extends Tab {
 

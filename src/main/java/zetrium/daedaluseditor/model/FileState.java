@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 /**
  *
- * @author xzidek
+ * @author Tomáš Zídek
  */
 public class FileState {
     Path path;

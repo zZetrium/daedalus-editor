@@ -25,8 +25,12 @@ package zetrium.jsonparser;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
-public class JsonValue {
+public abstract class JsonValue extends JsonElement {
+    
+    public JsonValue(int startOffset, int endOffset, int precedingWs) {
+        super(startOffset, endOffset, precedingWs);
+    }
     
 }
