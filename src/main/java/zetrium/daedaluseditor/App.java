@@ -30,6 +30,8 @@ import zetrium.daedaluseditor.controller.ControllerImplementation;
 import zetrium.daedaluseditor.controller.Controller;
 import zetrium.daedaluseditor.model.Model;
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -47,6 +49,7 @@ public class App extends Application {
         stage.setHeight(400);
         stage.setX(0);
         stage.setY(0);
+        
         
         // Apply AtlantaFX theme globally
         Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());

@@ -152,7 +152,7 @@ public class View implements MessageDisplayer {
 
         var editorBox = setupEditor();
         HBox.setHgrow(editorBox, Priority.ALWAYS);
-
+        editorBox.visibleProperty().set(true);
         var verticalDown = new HBox(projectList, editorBox);
         verticalDown.fillHeightProperty().set(true);
         verticalDown.setAlignment(Pos.CENTER);
