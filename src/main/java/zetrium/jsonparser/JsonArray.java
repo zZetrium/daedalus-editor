@@ -34,20 +34,20 @@ import java.util.function.UnaryOperator;
 
 /**
  *
- * @author Tomáš Zídek
+ * @author Ryzen
  */
-public class JsonArray extends JsonElement implements List<JsonElement> {
+public class JsonArray extends JsonNode implements List<JsonNode> {
+    List<JsonNode> children;
 
-    List<JsonElement> children;
-
-    public JsonArray(List<JsonElement> children, int startOffset, int endOffset, int precedingWs) {
-        super(startOffset, endOffset, precedingWs);
+    public JsonArray() {
+        this.children = new ArrayList<>();
+    }
+    
+    public JsonArray(List children) {
         this.children = children;
     }
-
-    public JsonArray(int startOffset, int endOffset, int precedingWs) {
-        this(new ArrayList<>(), startOffset, endOffset, precedingWs);
-    }
+    
+    
 
     @Override
     public int size() {
@@ -65,7 +65,7 @@ public class JsonArray extends JsonElement implements List<JsonElement> {
     }
 
     @Override
-    public Iterator<JsonElement> iterator() {
+    public Iterator<JsonNode> iterator() {
         return children.iterator();
     }
 
@@ -80,7 +80,7 @@ public class JsonArray extends JsonElement implements List<JsonElement> {
     }
 
     @Override
-    public boolean add(JsonElement e) {
+    public boolean add(JsonNode e) {
         return children.add(e);
     }
 
@@ -95,12 +95,12 @@ public class JsonArray extends JsonElement implements List<JsonElement> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends JsonElement> c) {
+    public boolean addAll(Collection<? extends JsonNode> c) {
         return children.addAll(c);
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends JsonElement> c) {
+    public boolean addAll(int index, Collection<? extends JsonNode> c) {
         return children.addAll(index, c);
     }
 
@@ -115,12 +115,12 @@ public class JsonArray extends JsonElement implements List<JsonElement> {
     }
 
     @Override
-    public void replaceAll(UnaryOperator<JsonElement> operator) {
+    public void replaceAll(UnaryOperator<JsonNode> operator) {
         children.replaceAll(operator);
     }
 
     @Override
-    public void sort(Comparator<? super JsonElement> c) {
+    public void sort(Comparator<? super JsonNode> c) {
         children.sort(c);
     }
 
@@ -140,22 +140,22 @@ public class JsonArray extends JsonElement implements List<JsonElement> {
     }
 
     @Override
-    public JsonElement get(int index) {
+    public JsonNode get(int index) {
         return children.get(index);
     }
 
     @Override
-    public JsonElement set(int index, JsonElement element) {
+    public JsonNode set(int index, JsonNode element) {
         return children.set(index, element);
     }
 
     @Override
-    public void add(int index, JsonElement element) {
+    public void add(int index, JsonNode element) {
         children.add(index, element);
     }
 
     @Override
-    public JsonElement remove(int index) {
+    public JsonNode remove(int index) {
         return children.remove(index);
     }
 
@@ -170,58 +170,58 @@ public class JsonArray extends JsonElement implements List<JsonElement> {
     }
 
     @Override
-    public ListIterator<JsonElement> listIterator() {
+    public ListIterator<JsonNode> listIterator() {
         return children.listIterator();
     }
 
     @Override
-    public ListIterator<JsonElement> listIterator(int index) {
+    public ListIterator<JsonNode> listIterator(int index) {
         return children.listIterator(index);
     }
 
     @Override
-    public List<JsonElement> subList(int fromIndex, int toIndex) {
+    public List<JsonNode> subList(int fromIndex, int toIndex) {
         return children.subList(fromIndex, toIndex);
     }
 
     @Override
-    public Spliterator<JsonElement> spliterator() {
+    public Spliterator<JsonNode> spliterator() {
         return children.spliterator();
     }
 
     @Override
-    public void addFirst(JsonElement e) {
+    public void addFirst(JsonNode e) {
         children.addFirst(e);
     }
 
     @Override
-    public void addLast(JsonElement e) {
+    public void addLast(JsonNode e) {
         children.addLast(e);
     }
 
     @Override
-    public JsonElement getFirst() {
+    public JsonNode getFirst() {
         return children.getFirst();
     }
 
     @Override
-    public JsonElement getLast() {
+    public JsonNode getLast() {
         return children.getLast();
     }
 
     @Override
-    public JsonElement removeFirst() {
+    public JsonNode removeFirst() {
         return children.removeFirst();
     }
 
     @Override
-    public JsonElement removeLast() {
+    public JsonNode removeLast() {
         return children.removeLast();
     }
 
     @Override
-    public List<JsonElement> reversed() {
+    public List<JsonNode> reversed() {
         return children.reversed();
     }
-
+    
 }

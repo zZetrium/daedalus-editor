@@ -33,7 +33,7 @@ import javafx.beans.property.SimpleObjectProperty;
 /**
  * Represents an opened project.
  *
- * @author Tomáš Zídek
+ * @author xzidek
  */
 public class Project {
 
@@ -81,4 +81,7 @@ public class Project {
     public String toString() {
         return "Project: "+getPath();
     }
+    
+    
+
 }

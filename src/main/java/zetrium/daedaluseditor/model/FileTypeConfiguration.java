@@ -25,7 +25,7 @@ package zetrium.daedaluseditor.model;
 
 /**
  *
- * @author Tomáš Zídek
+ * @author xzidek
  */
 public class FileTypeConfiguration {
     private String fileRegex;

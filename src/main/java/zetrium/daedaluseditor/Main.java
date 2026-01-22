@@ -25,7 +25,7 @@ package zetrium.daedaluseditor;
 
 /**
  * Only required to prevent crashes on app starup. Doesnt do anything except invoking {@link App#run() App.run()}
- * @author xzidek
+ * @author Tomáš Zídek
  */
 public class Main {
 

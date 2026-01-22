@@ -21,42 +21,12 @@
     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.*/
-package zetrium.daedaluseditor.view;
-
-import java.nio.file.Path;
-import javafx.scene.Node;
-import javafx.scene.control.Tab;
-import javafx.util.Pair;
-import zetrium.daedaluseditor.model.FileState;
+package zetrium.jsonparser;
 
 /**
  *
  * @author Ryzen
  */
-public class FileTab extends Tab {
-
-    private FileState fileState;
-
-    public FileTab() {
-    }
-
-    public FileTab(String string, FileState fileData) {
-        super(string);
-        this.fileState = fileData;
-    }
-
-    public FileTab(String string, Node node, FileState fileData) {
-        super(string, node);
-        this.fileState = fileData;
-
-    }
-
-    public FileState getFileState() {
-        return fileState;
-    }
-
-    public void setFileState(FileState fileState) {
-        this.fileState = fileState;
-    }
-
+public class JsonNode {
+    
 }
