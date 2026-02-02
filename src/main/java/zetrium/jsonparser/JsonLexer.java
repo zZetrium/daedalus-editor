@@ -121,4 +121,6 @@ public class JsonLexer {
                 false;
         };
     }
+    
+    //private void collectNumber
 }

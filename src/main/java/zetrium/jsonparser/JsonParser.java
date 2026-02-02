@@ -30,8 +30,8 @@ package zetrium.jsonparser;
  */
 public class JsonParser {
 
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+    public static void main(String[] args) throws LexingException {
+        System.out.println(new JsonLexer().lex("54").toString());
     }
     
    // public 
