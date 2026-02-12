@@ -1,4 +1,4 @@
-    /*
+/*
     Copyright (c) 2025 Tomáš Zídek
 
     Permission is hereby granted, free of charge, to any person
@@ -21,7 +21,6 @@
     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.*/
-
 package zetrium.jsonparser;
 
 /**
@@ -31,8 +30,11 @@ package zetrium.jsonparser;
 public class JsonParser {
 
     public static void main(String[] args) throws LexingException {
-        System.out.println(new JsonLexer().lex("54").toString());
+        var lexer = new JsonLexer();
+        for (int i = 0; i < 100; i++) {
+            System.out.println(lexer.lex("{ \"type\": \"minecraft:entity\", \"pools\": [ { \"bonus_rolls\": 0.0, \"entries\": [ { \"type\": \"minecraft:item\", \"functions\": [ { \"add\": false, \"count\": { \"type\": \"minecraft:uniform\", \"max\": 2.0, \"min\": 0.0 }, \"function\": \"minecraft:set_count\" }, { \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"enchantment\": \"minecraft:looting\", \"function\": \"minecraft:enchanted_count_increase\" } ], \"name\": \"minecraft:arrow\" } ], \"rolls\": 1.0 }, { \"bonus_rolls\": 0.0, \"entries\": [ { \"type\": \"minecraft:item\", \"functions\": [ { \"add\": false, \"count\": { \"type\": \"minecraft:uniform\", \"max\": 2.0, \"min\": 0.0 }, \"function\": \"minecraft:set_count\" }, { \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"enchantment\": \"minecraft:looting\", \"function\": \"minecraft:enchanted_count_increase\" } ], \"name\": \"minecraft:bone\" } ], \"rolls\": 1.0 }, { \"bonus_rolls\": 0.0, \"conditions\": [ { \"condition\": \"minecraft:killed_by_player\" } ], \"entries\": [ { \"type\": \"minecraft:item\", \"functions\": [ { \"add\": false, \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"function\": \"minecraft:set_count\" }, { \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"enchantment\": \"minecraft:looting\", \"function\": \"minecraft:enchanted_count_increase\", \"limit\": 1 }, { \"function\": \"minecraft:set_potion\", \"id\": \"minecraft:poison\" } ], \"name\": \"minecraft:tipped_arrow\" } ], \"rolls\": 1.0 } ], \"random_sequence\": \"minecraft:entities/bogged\" }{ \"type\": \"minecraft:entity\", \"pools\": [ { \"bonus_rolls\": 0.0, \"entries\": [ { \"type\": \"minecraft:item\", \"functions\": [ { \"add\": false, \"count\": { \"type\": \"minecraft:uniform\", \"max\": 2.0, \"min\": 0.0 }, \"function\": \"minecraft:set_count\" }, { \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"enchantment\": \"minecraft:looting\", \"function\": \"minecraft:enchanted_count_increase\" } ], \"name\": \"minecraft:arrow\" } ], \"rolls\": 1.0 }, { \"bonus_rolls\": 0.0, \"entries\": [ { \"type\": \"minecraft:item\", \"functions\": [ { \"add\": false, \"count\": { \"type\": \"minecraft:uniform\", \"max\": 2.0, \"min\": 0.0 }, \"function\": \"minecraft:set_count\" }, { \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"enchantment\": \"minecraft:looting\", \"function\": \"minecraft:enchanted_count_increase\" } ], \"name\": \"minecraft:bone\" } ], \"rolls\": 1.0 }, { \"bonus_rolls\": 0.0, \"conditions\": [ { \"condition\": \"minecraft:killed_by_player\" } ], \"entries\": [ { \"type\": \"minecraft:item\", \"functions\": [ { \"add\": false, \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"function\": \"minecraft:set_count\" }, { \"count\": { \"type\": \"minecraft:uniform\", \"max\": 1.0, \"min\": 0.0 }, \"enchantment\": \"minecraft:looting\", \"function\": \"minecraft:enchanted_count_increase\", \"limit\": 1 }, { \"function\": \"minecraft:set_potion\", \"id\": \"minecraft:poison\" } ], \"name\": \"minecraft:tipped_arrow\" } ], \"rolls\": 1.0 } ], \"random_sequence\": \"minecraft:entities/bogged\" }").toString());
+        }
     }
-    
-   // public 
+
+    // public 
 }

@@ -13,47 +13,19 @@ import java.util.Objects;
 public record Token(
         TokenType type,
         int startIndex,
-        String value // null for non STRING types
+        int endIndex,
+        String value,
+        String whitespace
+// null for non STRING and NUMBER types
         ) {
 
-    public int getEndIndex() {
-        return startIndex + value.length();
-    }
+    
 
     public int getLenght() {
-        return value.length();
+        return endIndex-startIndex;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
-    }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Token other = (Token) obj;
-        if (this.startIndex != other.startIndex) {
-            return false;
-        }
-        if (!Objects.equals(this.value, other.value)) {
-            return false;
-        }
-        return this.type == other.type;
-    }
 
-    @Override
-    public String toString() {
-        return "Token{" + "type=" + type + ", startIndex=" + startIndex + ", value=" + value + '}';
-    }
     
 }

@@ -24,11 +24,13 @@ public class JsonLexer {
         this.input = input;
         init();
 
-        char popped = 0;
-        while ((popped = pop()) != 0) {
+        char popped;
+        while (isInBounds()) {
+            popped = pop();
             if (isWhitespace(popped)) {
                 wsBuilder.append(popped);
             } else {
+                caser:
                 switch (popped) {
                     case ':' ->
                         addSimpleToken(TokenType.COLON);
@@ -47,22 +49,48 @@ public class JsonLexer {
 
                     case ']' ->
                         addSimpleToken(TokenType.CLOSE_SQUARE);
+                    case '"' -> {
+                        collectUntil('"');
+                        pop();
+                        var value = strBuilder.toString();
+                        addToken(new Token(TokenType.STRING, tokenStart, tokenStart + value.length() + 2, value, wsBuilder.toString()));
 
-                    case 't' -> {
-                        if (pop() == 'r' & pop() == 'u' & pop() == 'e') {
-                            addSimpleToken(TokenType.TRUE);
-                        } else {
-                            throw new LexingException("Invalid text token between " + tokenStart + " and " + (tokenStart + 3));
-                        }
                     }
 
-                    case 'f' -> {
-                        if (pop() == 'a' & pop() == 'l' & pop() == 's' & pop() == 'e') {
-                            addSimpleToken(TokenType.FALSE);
+                    default -> {
 
-                        }else {
-                            throw new LexingException("Invalid text token between " + tokenStart + " and " + (tokenStart + 4));
+                        if (isDigit(popped) || popped == '.') {
+                            back();
+                            collectNumber();
+                            var value = strBuilder.toString();
+                            addToken(new Token(TokenType.NUMBER, tokenStart, tokenStart + value.length(), value, wsBuilder.toString()));
+                            break caser;
                         }
+
+                        if (isWhitespace(popped)) {
+                            back();
+                            collectMultiWs();
+                            break caser;
+                        }
+                        if (isLetter(popped)) {
+                            back();
+                            collectWord();
+                            var identifier = strBuilder.toString();
+                            switch (identifier) {
+                                default ->
+                                    throw new LexingException("Unknown keyword at " + cur);
+                                case "true" ->
+                                    addSimpleToken(TokenType.TRUE);
+                                case "false" ->
+                                    addSimpleToken(TokenType.FALSE);
+                                case "null" ->
+                                    addSimpleToken(TokenType.NULL);
+
+                            }
+                            break caser;
+                        }
+
+                        throw new LexingException("Unknown input at " + cur + " of " + popped);
                     }
 
                 }
@@ -74,7 +102,14 @@ public class JsonLexer {
     }
 
     private void addSimpleToken(TokenType type) {
-        tokens.add(new Token(type, tokenStart, null));
+        //  tokens.add(new Token(type, tokenStart, null,wsBuilder.toString()));
+        addToken(new Token(type, tokenStart, type.getLenght() + tokenStart, null, wsBuilder.toString()));
+    }
+
+    private void addToken(Token token) {
+        tokens.add(token);
+        wsBuilder.setLength(0);
+        strBuilder.setLength(0);
     }
 
     private void init() {
@@ -85,24 +120,33 @@ public class JsonLexer {
         strBuilder = new StringBuilder(16);
     }
 
-    private char pop() {
+    private char pop() throws LexingException {
         return at(cur++);
     }
 
-    private char last() {
+    private char last() throws LexingException {
         return at(cur - 1);
     }
 
-    private char peek() {
+    private void back() {
+        cur--;
+    }
+
+    private char peek() throws LexingException {
         return at(cur);
     }
 
-    private char peek(int offset) {
+    private char peek(int offset) throws LexingException {
         return at(cur + offset);
     }
 
-    private char at(int index) {
-        return isInBounds(index) ? input.charAt(index) : 0;
+    private char at(int index) throws LexingException {
+        if (isInBounds(index)) {
+            return input.charAt(index);
+        } else {
+            throw new LexingException("End reached too early.");
+        }
+
     }
 
     private boolean isInBounds(int index) {
@@ -121,6 +165,63 @@ public class JsonLexer {
                 false;
         };
     }
-    
-    //private void collectNumber
+
+    public boolean isDigit(char c) {
+        return (c >= '0' && c <= '9');
+    }
+
+    public boolean isLetter(char c) {
+        return (c >= 'A' && c <= 'z');
+
+    }
+
+    private char collect(char c) {
+        strBuilder.append(c);
+        return c;
+    }
+
+    private char collectWs(char c) {
+        wsBuilder.append(c);
+        return c;
+    }
+
+    private void collectNumber() throws LexingException {
+        char first = collect(pop());
+
+        if (!isDigit(first) && first != '.') {
+            return;
+        }
+
+        collectDigitSeq();
+
+        if (first != '.' && peek() == '.') {
+            collect(pop());
+            collectDigitSeq();
+        }
+    }
+
+    private void collectDigitSeq() throws LexingException {
+        while (isDigit(peek())) {
+            collect(pop());
+        }
+    }
+
+    private void collectMultiWs() throws LexingException {
+        while (isWhitespace(peek())) {
+            collectWs(pop());
+        }
+    }
+
+    private void collectWord() throws LexingException {
+        while (isLetter(peek())) {
+            collect(pop());
+        }
+    }
+
+    private void collectUntil(char c) throws LexingException {
+        while (c != peek()) {
+            collect(pop());
+        }
+    }
+
 }

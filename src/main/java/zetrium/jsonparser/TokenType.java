@@ -9,8 +9,23 @@ package zetrium.jsonparser;
  * @author xzidek
  */
 public enum TokenType {
-    OPEN_CURLY,CLOSE_CURLY,
-    OPEN_SQUARE,CLOSE_SQUARE,
-    STRING,TRUE,FALSE,NULL,
-    COMMA,COLON,
+    OPEN_CURLY(1),CLOSE_CURLY(1),
+    OPEN_SQUARE(1),CLOSE_SQUARE(1),
+    STRING(-1),TRUE(4),FALSE(5),NULL(4),NUMBER(-1),
+    COMMA(1),COLON(1);
+    
+    private final int lenght;
+    private TokenType(int lenght) {
+        this.lenght = lenght;
+    }
+    
+    public int getLenght() {
+        return lenght;
+    }
+    
+    public boolean isLenghtFixed() {
+        return lenght != -1;
+    }
+    
+    
 }
