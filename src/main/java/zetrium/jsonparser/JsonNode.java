@@ -25,8 +25,16 @@ package zetrium.jsonparser;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
-public class JsonNode {
-    
+public sealed interface JsonNode permits JsonValue, JsonArray, JsonObject {
+
+    int start();
+
+    int length();
+
+    default int end() {
+        return start() + length();
+    }
+
 }

@@ -24,6 +24,7 @@
 package zetrium.jsonparser;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,147 +34,13 @@ import java.util.function.Function;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
-public class JsonObject extends JsonNode implements Map<String,JsonNode>{
-    Map<String,JsonNode> children;
+public record JsonObject(int start, int length, Map<String, ? extends JsonNode> children) implements JsonNode {
 
-    public JsonObject() {
-        this.children = new HashMap();
+    public JsonObject(int start, int length, Map<String, ? extends JsonNode> children) {
+        this.start = start;
+        this.length = length;
+        this.children = Map.copyOf(children);
     }
-
-    public JsonObject(Map<String, JsonNode> children) {
-        this.children = children;
-    }
-    
-    
-    
-
-    @Override
-    public int size() {
-        return children.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return children.isEmpty();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return children.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(Object value) {
-        return children.containsValue(value);
-    }
-
-    @Override
-    public JsonNode get(Object key) {
-        return children.get(key);
-    }
-
-    @Override
-    public JsonNode put(String key, JsonNode value) {
-        return children.put(key, value);
-    }
-
-    @Override
-    public JsonNode remove(Object key) {
-        return children.remove(key);
-    }
-
-    @Override
-    public void putAll(Map<? extends String, ? extends JsonNode> m) {
-        children.putAll(m);
-    }
-
-    @Override
-    public void clear() {
-        children.clear();
-    }
-
-    @Override
-    public Set<String> keySet() {
-        return children.keySet();
-    }
-
-    @Override
-    public Collection<JsonNode> values() {
-        return children.values();
-    }
-
-    @Override
-    public Set<Entry<String, JsonNode>> entrySet() {
-        return children.entrySet();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return children.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return children.hashCode();
-    }
-
-    @Override
-    public JsonNode getOrDefault(Object key, JsonNode defaultValue) {
-        return children.getOrDefault(key, defaultValue);
-    }
-
-    @Override
-    public void forEach(BiConsumer<? super String, ? super JsonNode> action) {
-        children.forEach(action);
-    }
-
-    @Override
-    public void replaceAll(BiFunction<? super String, ? super JsonNode, ? extends JsonNode> function) {
-        children.replaceAll(function);
-    }
-
-    @Override
-    public JsonNode putIfAbsent(String key, JsonNode value) {
-        return children.putIfAbsent(key, value);
-    }
-
-    @Override
-    public boolean remove(Object key, Object value) {
-        return children.remove(key, value);
-    }
-
-    @Override
-    public boolean replace(String key, JsonNode oldValue, JsonNode newValue) {
-        return children.replace(key, oldValue, newValue);
-    }
-
-    @Override
-    public JsonNode replace(String key, JsonNode value) {
-        return children.replace(key, value);
-    }
-
-    @Override
-    public JsonNode computeIfAbsent(String key, Function<? super String, ? extends JsonNode> mappingFunction) {
-        return children.computeIfAbsent(key, mappingFunction);
-    }
-
-    @Override
-    public JsonNode computeIfPresent(String key, BiFunction<? super String, ? super JsonNode, ? extends JsonNode> remappingFunction) {
-        return children.computeIfPresent(key, remappingFunction);
-    }
-
-    @Override
-    public JsonNode compute(String key, BiFunction<? super String, ? super JsonNode, ? extends JsonNode> remappingFunction) {
-        return children.compute(key, remappingFunction);
-    }
-
-    @Override
-    public JsonNode merge(String key, JsonNode value, BiFunction<? super JsonNode, ? super JsonNode, ? extends JsonNode> remappingFunction) {
-        return children.merge(key, value, remappingFunction);
-    }
-
-    
-    
 }

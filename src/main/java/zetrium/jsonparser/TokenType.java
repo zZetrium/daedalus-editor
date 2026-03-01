@@ -21,12 +21,30 @@
     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.*/
-package zetrium.galeforce;
+package zetrium.jsonparser;
 
 /**
  *
  * @author Tomáš Zídek
  */
-public class NodeBuilder {
+public enum TokenType {
+    OPEN_CURLY(1),CLOSE_CURLY(1),
+    OPEN_SQUARE(1),CLOSE_SQUARE(1),
+    STRING(-1),TRUE(4),FALSE(5),NULL(4),NUMBER(-1),
+    COMMA(1),COLON(1);
+    
+    private final int lenght;
+    private TokenType(int lenght) {
+        this.lenght = lenght;
+    }
+    
+    public int getLenght() {
+        return lenght;
+    }
+    
+    public boolean isLenghtFixed() {
+        return lenght != -1;
+    }
+    
     
 }

@@ -25,8 +25,8 @@ package zetrium.jsonparser;
 
 /**
  *
- * @author Ryzen
+ * @author Tomáš Zídek
  */
-public class JsonValue {
+public non-sealed interface JsonValue extends JsonNode {
     
 }

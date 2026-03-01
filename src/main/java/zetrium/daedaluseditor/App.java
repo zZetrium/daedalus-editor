@@ -34,6 +34,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 
+/**
+ *
+ * @author Tomáš Zídek
+ */
 public class App extends Application {
     
     @Override

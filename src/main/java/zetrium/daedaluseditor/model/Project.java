@@ -33,7 +33,7 @@ import javafx.beans.property.SimpleObjectProperty;
 /**
  * Represents an opened project.
  *
- * @author xzidek
+ * @author Tomáš Zídek
  */
 public class Project {
 

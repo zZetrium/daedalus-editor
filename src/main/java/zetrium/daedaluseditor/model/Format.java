@@ -25,7 +25,7 @@ package zetrium.daedaluseditor.model;
 
 /**
  * One of the supported file formats or Unknown which is used for unknown formats.
- * @author xzidek
+ * @author Tomáš Zídek
  */
 public enum Format {
     Unknown,Json

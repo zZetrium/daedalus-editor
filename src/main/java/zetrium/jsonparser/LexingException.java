@@ -21,12 +21,31 @@
     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.*/
-package zetrium.galeforce;
+package zetrium.jsonparser;
 
 /**
  *
  * @author Tomáš Zídek
  */
-public class NodeBuilder {
+public class LexingException extends Exception {
+
+    public LexingException() {
+    }
+
+    public LexingException(String message) {
+        super(message);
+    }
+
+    public LexingException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public LexingException(Throwable cause) {
+        super(cause);
+    }
+
+    public LexingException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
     
 }
