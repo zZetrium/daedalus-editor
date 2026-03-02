@@ -78,7 +78,7 @@ public class JsonLexer {
 
                     default -> {
 
-                        if (isDigit(popped) || popped == '.') {
+                        if (isDigit(popped) || popped == '.' || popped == '-') {
                             back();
                             collectNumber();
                             var value = strBuilder.toString();
@@ -205,18 +205,21 @@ public class JsonLexer {
     }
 
     private void collectNumber() throws LexingException {
-        char first = collect(pop());
-
-        if (!isDigit(first) && first != '.') {
-            return;
-        }
 
         collectDigitSeq();
+        if (peek()) {
+            
+        }
 
-        if (first != '.' && peek() == '.') {
+        if (peek() == '.') {
             collect(pop());
             collectDigitSeq();
         }
+        if (peek()=='e'||peek()=='E') {
+            collect(pop());
+            collectDigitSeq();
+        }
+
     }
 
     private void collectDigitSeq() throws LexingException {
