@@ -31,20 +31,18 @@ import java.util.Objects;
  */
 public record Token(
         TokenType type,
-        int startIndex,
-        int endIndex,
-        String value,
+        int start,
+        int end,
+        String value, // null for non STRING and NUMBER types
         String whitespace
-// null for non STRING and NUMBER types
         ) {
 
-    
-
-    public int getLenght() {
-        return endIndex-startIndex;
+    public int lenght() {
+        return end - start;
     }
 
+    public String value() {
+        return type.value() == null ? this.value : type.value();
+    }
 
-
-    
 }

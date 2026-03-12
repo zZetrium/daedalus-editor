@@ -42,7 +42,7 @@ public class JsonLexer {
     public List<Token> lex(String input) throws LexingException {
         this.input = input;
         init();
-
+        System.out.println(isLetter(']'));
         char popped;
         while (isInBounds()) {
             popped = pop();
@@ -97,7 +97,7 @@ public class JsonLexer {
                             var identifier = strBuilder.toString();
                             switch (identifier) {
                                 default ->
-                                    throw new LexingException("Unknown keyword at " + cur);
+                                    throw new LexingException("Unknown keyword "+identifier+" at " + cur);
                                 case "true" ->
                                     addSimpleToken(TokenType.TRUE);
                                 case "false" ->
@@ -122,7 +122,7 @@ public class JsonLexer {
 
     private void addSimpleToken(TokenType type) {
         //  tokens.add(new Token(type, tokenStart, null,wsBuilder.toString()));
-        addToken(new Token(type, tokenStart, type.getLenght() + tokenStart, null, wsBuilder.toString()));
+        addToken(new Token(type, tokenStart, type.length() + tokenStart, null, wsBuilder.toString()));
     }
 
     private void addToken(Token token) {
@@ -159,11 +159,11 @@ public class JsonLexer {
         return at(cur + offset);
     }
 
-    private char at(int index) throws LexingException {
+    private char at(int index) {
         if (isInBounds(index)) {
             return input.charAt(index);
         } else {
-            throw new LexingException("End reached too early.");
+            return 0;
         }
 
     }
@@ -190,7 +190,7 @@ public class JsonLexer {
     }
 
     public boolean isLetter(char c) {
-        return (c >= 'A' && c <= 'z');
+        return (c >= 'A' && c <= 'Z')||(c >= 'a' && c <= 'z');
 
     }
 
@@ -206,16 +206,15 @@ public class JsonLexer {
 
     private void collectNumber() throws LexingException {
 
-        collectDigitSeq();
-        if (peek()) {
-            
+        if (peek() == '-') {
+            collect(pop());
         }
-
+        collectDigitSeq();
         if (peek() == '.') {
             collect(pop());
             collectDigitSeq();
         }
-        if (peek()=='e'||peek()=='E') {
+        if (peek() == 'e' || peek() == 'E') {
             collect(pop());
             collectDigitSeq();
         }
