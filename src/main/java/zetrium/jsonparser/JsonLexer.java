@@ -42,12 +42,13 @@ public class JsonLexer {
     public List<Token> lex(String input) throws LexingException {
         this.input = input;
         init();
-        System.out.println(isLetter(']'));
         char popped;
         while (isInBounds()) {
             popped = pop();
             if (isWhitespace(popped)) {
                 wsBuilder.append(popped);
+                                            collectMultiWs();
+
             } else {
                 caser:
                 switch (popped) {
@@ -86,18 +87,13 @@ public class JsonLexer {
                             break caser;
                         }
 
-                        if (isWhitespace(popped)) {
-                            back();
-                            collectMultiWs();
-                            break caser;
-                        }
                         if (isLetter(popped)) {
                             back();
                             collectWord();
                             var identifier = strBuilder.toString();
                             switch (identifier) {
                                 default ->
-                                    throw new LexingException("Unknown keyword "+identifier+" at " + cur);
+                                    throw new LexingException("Unknown keyword " + identifier + " at " + cur);
                                 case "true" ->
                                     addSimpleToken(TokenType.TRUE);
                                 case "false" ->
@@ -190,7 +186,7 @@ public class JsonLexer {
     }
 
     public boolean isLetter(char c) {
-        return (c >= 'A' && c <= 'Z')||(c >= 'a' && c <= 'z');
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 
     }
 
@@ -216,6 +212,9 @@ public class JsonLexer {
         }
         if (peek() == 'e' || peek() == 'E') {
             collect(pop());
+            if (peek() == '-' || peek() == '+') {
+                collect(pop());
+            }
             collectDigitSeq();
         }
 
@@ -240,7 +239,7 @@ public class JsonLexer {
     }
 
     private void collectUntil(char c) throws LexingException {
-        while (c != peek()) {
+        while (c != peek() && isInBounds(cur)) {
             collect(pop());
         }
     }
