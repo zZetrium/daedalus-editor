@@ -70,10 +70,11 @@ public class JsonLexer {
                     case ']' ->
                         addSimpleToken(TokenType.CLOSE_SQUARE);
                     case '"' -> {
+                        collect('"');
                         collectUntil('"');
-                        pop();
+                        collect(pop());
                         var value = strBuilder.toString();
-                        addToken(new Token(TokenType.STRING, tokenStart, tokenStart + value.length() + 2, value, wsBuilder.toString()));
+                        addToken(new Token(TokenType.STRING, value, wsBuilder.toString()));
 
                     }
 
@@ -83,7 +84,7 @@ public class JsonLexer {
                             back();
                             collectNumber();
                             var value = strBuilder.toString();
-                            addToken(new Token(TokenType.NUMBER, tokenStart, tokenStart + value.length(), value, wsBuilder.toString()));
+                            addToken(new Token(TokenType.NUMBER, value, wsBuilder.toString()));
                             break caser;
                         }
 
@@ -118,7 +119,7 @@ public class JsonLexer {
 
     private void addSimpleToken(TokenType type) {
         //  tokens.add(new Token(type, tokenStart, null,wsBuilder.toString()));
-        addToken(new Token(type, tokenStart, type.length() + tokenStart, null, wsBuilder.toString()));
+        addToken(new Token(type, wsBuilder.toString()));
     }
 
     private void addToken(Token token) {
@@ -190,9 +191,13 @@ public class JsonLexer {
 
     }
 
-    private char collect(char c) {
+   private char collect(char c) {
         strBuilder.append(c);
         return c;
+    }
+   private String collect(String str) {
+        strBuilder.append(str);
+        return str;
     }
 
     private char collectWs(char c) {

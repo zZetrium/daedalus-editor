@@ -23,6 +23,8 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.jsonparser;
 
+import java.util.Optional;
+
 /**
  *
  * @author Tomáš Zídek
@@ -36,13 +38,17 @@ public enum TokenType {
     private final int length;
     private final String value;
 
-    private TokenType(int lenght, String value) {
-        this.length = lenght;
+    private TokenType(int length, String value) {
+        this.length = length;
         this.value = value;
     }
 
     public int length() {
         return length;
+    }
+    
+    public Optional<Integer> maybeLength() {
+        return length == -1 ? Optional.empty() : Optional.of(length);
     }
 
     public String value() {

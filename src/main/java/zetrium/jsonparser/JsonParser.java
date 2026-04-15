@@ -23,10 +23,12 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.jsonparser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import static zetrium.jsonparser.Json.*;
 
 /**
  *
@@ -39,7 +41,7 @@ public class JsonParser {
     public static void main(String[] args) throws LexingException {
         var lexer = new JsonLexer();
         for (int i = 0; i < 100; i++) {
-            System.out.println(lexer.lex("{\"hallo\":-3.6e7,[null]}").toString());
+            System.out.println(Token.recover(lexer.lex("{\"hallo \":  -3.6e7,[null]}")));
         }
     }
 
@@ -58,34 +60,46 @@ public class JsonParser {
         return switch (peek().type()) {
             case OPEN_CURLY ->
                 parseObject();
+            case OPEN_SQUARE ->
+                parseArray();
             case TRUE, FALSE, NULL, NUMBER, STRING ->
                 Json.Value.of(iter.next());
-            case ERROR -> new Json.Error(iter.next(),"Illegal token");
+//            case ERROR -> new Json.Error(iter.next(),"Illegal token");
             default ->
-                new Json.Error(iter.next(),"Illegal start");
+                null;
+            //    new Json.Error(iter.next(),"Illegal start");
 
         };
 
     }
 
     private Json.Node parseObject() {
-        var valueBuilder = new StringBuilder();
-        var first = iter.next();
-        var last = first;
-        if (first.type()!=TokenType.OPEN_CURLY) {
+        var start = iter.next();
+        if (start.type() != TokenType.OPEN_CURLY) {
             // should never happen
-            throw new AssertionError("Token type must be OPEN_CURLY");
+            throw new IllegalStateException("next token must be OPEN_CURLY not " + start.type());
         }
-        Map<String,Json.Node> children = new HashMap<>();
+        List<Obj.Entry> entries = new ArrayList<>();
         while (true) {
-            if (!iter.hasNext()) {
-                return new Json.Error(first.start(),last.end(),valueBuilder.toString(),"Input ran out too early");
-            }
-            var cur = iter.next();
-            if (cur.type()!=TokenType.STRING) {
-                return new Json.Error
+            var key = iter.next();
+            var colon = iter.next();
+            var value = parseNode();
+            var commaOrEnd = iter.next();
+            switch (commaOrEnd.type()) {
+                case COMMA -> {
+                    entries.add(new Obj.Entry(key,colon,value,commaOrEnd));
+                }
+                case CLOSE_CURLY -> {
+                    entries.add(new Obj.Entry(key,colon,value,null));
+                    return new Obj(start, commaOrEnd, entries);
+                }
             }
         }
+
+    }
+
+    private Json.Node parseArray() {
+        throw new UnsupportedOperationException("TODO"); 
     }
 
 }

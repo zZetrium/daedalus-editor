@@ -23,7 +23,10 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.jsonparser;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -31,18 +34,74 @@ import java.util.Objects;
  */
 public record Token(
         TokenType type,
-        int start,
-        int end,
-        String value, // null for non STRING and NUMBER types
+        String value, // null for fixed length types
         String whitespace
         ) {
 
-    public int lenght() {
-        return end - start;
-    }
-
     public String value() {
         return type.value() == null ? this.value : type.value();
+    }
+
+    public Token(TokenType type, String value, String whitespace) {
+        Objects.requireNonNull(type, "type must not be null");
+        if (type.isLengthFixed()) {
+            if (value != null && !value.equals(type.value())) {
+                throw new IllegalArgumentException("value for fixed token types must be null or equal to type.value()");
+            }
+            value = type.value();
+
+        } else {
+            if (value == null) {
+                throw new IllegalArgumentException("value for non-fixed length types must be non-null");
+            }
+            if (type == TokenType.NUMBER && !isValidNumber(value)) {
+                throw new IllegalArgumentException("number values must match -?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
+            }
+
+        }
+        if (whitespace == null) {
+            whitespace = "";
+        }
+
+        this.type = type;
+        this.value = value;
+        this.whitespace = whitespace;
+    }
+
+    public Token(TokenType type, String whitespace) {
+        if (!type.isLengthFixed()) {
+            throw new IllegalArgumentException("this constructor must not be used with non-fixed token types");
+        }
+        this(type, null, whitespace);
+    }
+
+    public int entireLength() {
+        return length() + whitespace.length();
+    }
+
+    public int length() {
+        return type.isLengthFixed() ? type.length() : value.length();
+    }
+    private static Predicate<String> numPredicate = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?").asMatchPredicate();
+
+    public static boolean isValidNumber(String num) {
+        return numPredicate.test(num);
+    }
+    
+    public static String recover(Token... tokens) {
+        var result = new StringBuilder(tokens.length);
+        for (var token:tokens) {
+            result.append(token.value());
+        }
+        return result.toString();
+    }
+    
+    public static String recover(List<Token> tokens) {
+        var result = new StringBuilder(tokens.size());
+        for (var token:tokens) {
+            result.append(token.whitespace()).append(token.value());
+        }
+        return result.toString();
     }
 
 }
