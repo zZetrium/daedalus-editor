@@ -175,10 +175,10 @@ public class View implements MessageDisplayer {
 
     private TreeItem<Path> createNode(final Path f) {
         return new TreeItem<Path>(f) {
-            // We cache whether the ProjectNode is a leaf or not. A ProjectNode is a leaf if
+            // We cache whether the Path is a leaf or not. A Path is a leaf if
             // it is not a directory and does not have any files contained within
             // it. We cache this as isLeaf() is called often, and doing the
-            // actual check on ProjectNode is expensive.
+            // actual check on Path is expensive.
             private boolean isLeaf;
 
             // We do the children and leaf testing only once, and then set these
@@ -196,7 +196,7 @@ public class View implements MessageDisplayer {
                     isFirstTimeChildren = false;
 
                     // First getChildren() call, so we actually go off and
-                    // determine the children of the ProjectNode contained in this TreeItem.
+                    // determine the children of the Path contained in this TreeItem.
                     super.getChildren().setAll(buildChildren(this));
                 }
                 return super.getChildren();
@@ -302,7 +302,7 @@ public class View implements MessageDisplayer {
         projectList.setFixedCellSize(20);
         projectList.showRootProperty().set(false);
         projectListListener = (ListChangeListener.Change<? extends Project> change) -> {
-            System.out.println("hear");
+            //System.out.println("hear");
             TreeItem<Path> root = new TreeItem<>(null);
             for (Project p : model.getProjects()) {
                 root.getChildren().add(createNode(p.getProjectRoot()));
@@ -409,7 +409,7 @@ public class View implements MessageDisplayer {
 
     private void connectModel() {
 
-        projectListListener.onChanged(null);
+        //projectListListener.onChanged(null);
         model.getOpenedFiles().addListener((Change<? extends Path, ? extends FileState> change) -> {
             if (change.wasAdded() && change.wasRemoved()) {
                 // changed

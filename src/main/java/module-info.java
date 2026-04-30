@@ -34,5 +34,8 @@ module zetrium.daedaluseditor {
     exports zetrium.daedaluseditor.controller;
     exports zetrium.daedaluseditor.model;
     exports zetrium.daedaluseditor.view;
+        requires javafx.fxml;
+
+    opens zetrium.daedaluseditor.view to javafx.fxml;
 
 }

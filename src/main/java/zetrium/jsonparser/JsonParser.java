@@ -31,7 +31,7 @@ import java.util.Map;
 import static zetrium.jsonparser.Json.*;
 
 /**
- *
+ * probably useless
  * @author Tomáš Zídek
  */
 public class JsonParser {

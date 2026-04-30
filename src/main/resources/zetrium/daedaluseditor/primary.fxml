@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      
+      fillWidth="true">
+
+    <!-- Top bar -->
+    <HBox spacing="5">
+        <Button fx:id="projectButton" text="Project"/>
+    </HBox>
+
+    <!-- Main content -->
+    <HBox VBox.vgrow="ALWAYS">
+
+        <!-- Project tree -->
+        <TreeView fx:id="projectList"
+                  prefWidth="250"
+                  HBox.hgrow="NEVER"/>
+
+        <!-- Editor -->
+        <VBox HBox.hgrow="ALWAYS">
+            <TabPane fx:id="editorPane"
+                     VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+    </HBox>
+</VBox>

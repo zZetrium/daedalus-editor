@@ -24,6 +24,7 @@
 package zetrium.daedaluseditor;
 
 import atlantafx.base.theme.*;
+import java.io.IOException;
 
 import zetrium.daedaluseditor.view.View;
 import zetrium.daedaluseditor.controller.ControllerImplementation;
@@ -32,6 +33,9 @@ import zetrium.daedaluseditor.model.Model;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
@@ -39,33 +43,48 @@ import javafx.stage.Stage;
  * @author Tomáš Zídek
  */
 public class App extends Application {
-    
+
+    private static Scene scene;
+
     @Override
     public void start(Stage stage) {
-        
+
         Model m = new Model();
         Controller c = new ControllerImplementation(m, null);
-        View v = new View(stage, m, c);
-        c.setMessageDisplayer(v);
-        stage.setScene(v.getScene());
+        try {
+            //View v = new View(stage, m, c);
+            //c.setMessageDisplayer(v);
+            App.scene = new Scene(loadFXML("primary"));
+        } catch (IOException ex) {
+            System.getLogger(App.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        stage.setScene(scene);
         stage.show();
         stage.setWidth(800);
         stage.setHeight(400);
         stage.setX(0);
         stage.setY(0);
-        
-        
+
         // Apply AtlantaFX theme globally
-        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 
         stage.getScene().getStylesheets().add(
                 getClass().getClassLoader().getResource("fix.css").toExternalForm()
         );
-        
+
     }
-    
+
     public static void run() {
         launch();
     }
-    
+
+    static void setRoot(String fxml) throws IOException {
+        scene.setRoot(loadFXML(fxml));
+    }
+
+    private static Parent loadFXML(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        return fxmlLoader.load();
+    }
+
 }
