@@ -45,16 +45,15 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private static Scene scene;
+    private static Stage stage;
 
     @Override
     public void start(Stage stage) {
-
+        App.stage = stage;
         Model m = new Model();
         Controller c = new ControllerImplementation(m, null);
         try {
-            //View v = new View(stage, m, c);
-            //c.setMessageDisplayer(v);
-            App.scene = new Scene(loadFXML("primary"));
+            scene = new Scene(Util.loadFXML("primary"));
         } catch (IOException ex) {
             System.getLogger(App.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
@@ -79,12 +78,18 @@ public class App extends Application {
     }
 
     static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
+        scene.setRoot(Util.loadFXML(fxml));
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+    public static Scene getScene() {
+        return scene;
     }
+    
+    public static Stage getStage() {
+        return stage;
+    }
+    
+    
+
 
 }

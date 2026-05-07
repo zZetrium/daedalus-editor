@@ -3,27 +3,27 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns:fx="http://javafx.com/fxml" fx:id="primaryRoot" fx:controller="zetrium.daedaluseditor.PrimaryViewController"
       
       fillWidth="true">
 
-    <!-- Top bar -->
-    <HBox spacing="5">
-        <Button fx:id="projectButton" text="Project"/>
-    </HBox>
+    <!-- top bar -->
+    <MenuBar fx:id="topMenuBar" >
+        <Menu fx:id="projectMenuOption" text="Project"  >
+            <MenuItem  onAction="#chooseFile" text="Choose file" />
+            <MenuItem  onAction="#chooseDirectory" text="Choose directory" />
+        </Menu>
+    </MenuBar>
 
-    <!-- Main content -->
+    <!-- main -->
     <HBox VBox.vgrow="ALWAYS">
 
-        <!-- Project tree -->
-        <TreeView fx:id="projectList"
-                  prefWidth="250"
-                  HBox.hgrow="NEVER"/>
+        <!-- project tree -->
+        <TreeView fx:id="projectList" prefWidth="250" HBox.hgrow="NEVER" />
 
-        <!-- Editor -->
+        <!-- editor -->
         <VBox HBox.hgrow="ALWAYS">
-            <TabPane fx:id="editorPane"
-                     VBox.vgrow="ALWAYS"/>
+            <TabPane fx:id="editorPane" VBox.vgrow="ALWAYS"/>
         </VBox>
 
     </HBox>
