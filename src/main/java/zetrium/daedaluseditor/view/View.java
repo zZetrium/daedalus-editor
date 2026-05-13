@@ -80,6 +80,7 @@ import javafx.util.Pair;
  *
  * @author Tomáš Zídek
  */
+@Deprecated
 public class View implements MessageDisplayer {
 
     private Stage stage;
