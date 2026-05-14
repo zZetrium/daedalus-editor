@@ -83,6 +83,10 @@ public class PrimaryViewController {
             // exercise for the reader.
             private boolean isFirstTimeChildren = true;
             private boolean isFirstTimeLeaf = true;
+            
+            {
+                setGraphic(isLeaf()? new FontIcon(MaterialDesignF.FILE) : new FontIcon(MaterialDesignF.FOLDER));
+            }
 
             @Override
             public ObservableList<TreeItem<File>> getChildren() {
@@ -125,40 +129,7 @@ public class PrimaryViewController {
                 return FXCollections.emptyObservableList();
             }
 
-            private TreeCell<Path> createCell(TreeItem<Path> item) {
-                var cell = new TreeCell<Path>() {
-                    @Override
-                    protected void updateItem(Path t, boolean empty) {
-                        super.updateItem(t, empty);
-                        if (empty || t == null) {
-
-                            setText(null);
-
-                            setGraphic(null);
-
-                            return;
-
-                        }
-                        var icon = Files.isDirectory(t) ? new FontIcon(MaterialDesignF.FOLDER) : new FontIcon(MaterialDesignF.FILE);
-                        var label = new Label(stringifyPath(t));
-                        var graphic = new HBox(icon, label);
-                        //setScale(label, 0.7);
-                        // this.prefWidth(10);
-                        graphic.setSpacing(5);
-                        setGraphic(graphic);
-                        setPrefHeight(20);
-                    }
-
-                };
-
-                cell.setOnMouseClicked(event -> {
-                    if (event.getClickCount() == 2 && !cell.isEmpty()) {
-                        //fileSelector.accept(cell.getItem());
-                    }
-                });
-
-                return cell;
-            }
+         
         };
     }
 
@@ -166,5 +137,6 @@ public class PrimaryViewController {
         return path.getFileName() != null ? path.getFileName().toString() : path.toString();
 
     }
+    
 
 }

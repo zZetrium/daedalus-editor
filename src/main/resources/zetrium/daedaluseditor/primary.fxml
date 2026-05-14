@@ -23,7 +23,7 @@
     <HBox VBox.vgrow="ALWAYS">
 
         <!-- project tree -->
-        <TreeView fx:id="projectList" prefWidth="250" showRoot="false" HBox.hgrow="NEVER"> 
+        <TreeView fx:id="projectList" prefWidth="250" showRoot="false" HBox.hgrow="NEVER" > 
             <TreeItem />
         </TreeView>
 
