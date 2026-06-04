@@ -4,6 +4,8 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+
 <?import javafx.scene.control.TreeItem?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.HBox?>
@@ -23,13 +25,15 @@
     <HBox VBox.vgrow="ALWAYS">
 
         <!-- project tree -->
-        <TreeView fx:id="projectList" prefWidth="250" showRoot="false" HBox.hgrow="NEVER" > 
+        <TreeView fx:id="projectList" prefWidth="250" showRoot="false" HBox.hgrow="NEVER" onMouseClicked="#pressTreeItem"  > 
             <TreeItem />
         </TreeView>
 
         <!-- editor -->
         <VBox HBox.hgrow="ALWAYS">
-            <TabPane fx:id="editorPane" VBox.vgrow="ALWAYS" />
+            <TabPane fx:id="editorPane" VBox.vgrow="ALWAYS" >
+                <Tab text="Source" closable="false"  ></Tab>
+            </TabPane>
         </VBox>
 
     </HBox>

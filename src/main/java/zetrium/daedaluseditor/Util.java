@@ -14,9 +14,14 @@ import javafx.scene.Parent;
  */
 public class Util {
 
+    private static FXMLLoader loader;
+
     static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+        if (loader == null) {
+            loader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+
+        }
+        return loader.load();
     }
-    
+
 }

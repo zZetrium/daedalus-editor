@@ -23,6 +23,7 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -43,8 +44,20 @@ import zetrium.daedaluseditor.view.View;
  * @author Tomáš Zídek
  */
 public class ControllerImplementation implements Controller {
+    
+    Model m;
 
-    private Model model;
+    public ControllerImplementation(Model m) {
+        this.m = m;
+    }
+    
+
+    @Override
+    public ObservableList<Project> getProjects() {
+        return m.getProjects();
+    }
+
+    /*private Model model;
     private MessageDisplayer messageDisplayer;
 
     public ControllerImplementation(Model model, MessageDisplayer messageDisplayer) {
@@ -136,6 +149,7 @@ public class ControllerImplementation implements Controller {
         }
         fs.setSaved(true);
         return true;
-    }
+    }*/
+    
 
 }

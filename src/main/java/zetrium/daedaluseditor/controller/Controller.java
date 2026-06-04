@@ -23,8 +23,11 @@
     OTHER DEALINGS IN THE SOFTWARE.*/
 package zetrium.daedaluseditor.controller;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.stream.Stream;
+import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import zetrium.daedaluseditor.model.Model;
 import zetrium.daedaluseditor.model.FileState;
 import zetrium.daedaluseditor.model.Project;
@@ -35,7 +38,7 @@ import zetrium.daedaluseditor.model.Project;
  */
 public interface Controller {
 
-    void sourceEdited(String source);
+    /*void sourceEdited(String source);
 
     void setModel(Model model);
 
@@ -59,6 +62,8 @@ public interface Controller {
             projects[i] = openProject(paths[i]);
         }
         return projects;
-    }
+    }*/
+    
+     ObservableList<Project> getProjects();
 
 }

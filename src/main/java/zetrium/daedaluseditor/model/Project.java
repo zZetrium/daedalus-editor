@@ -27,6 +27,7 @@ import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.List;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -39,13 +40,13 @@ public class Project {
 
     // platform specific path
     //private final StringProperty path = new SimpleStringProperty();
-    private final transient Property<Path> projectRoot = new SimpleObjectProperty<>();
+    private final transient ObjectProperty<File> projectRoot = new SimpleObjectProperty<>();
 
     public Project(String path) {
-        projectRoot.setValue(FileSystems.getDefault().getPath(path));
+        projectRoot.setValue(new File(path));
     }
-    public Project(Path path) {
-        projectRoot.setValue(path);
+    public Project(File file) {
+        projectRoot.setValue(file);
     }
 
     /*public static Project[] fromFiles(List<File> files) {
@@ -62,18 +63,18 @@ public class Project {
 
 
     public String getPath() {
-        return projectRoot.getValue().toAbsolutePath().toString();
+        return projectRoot.get().getAbsolutePath();
     }
 
-    public Path getProjectRoot() {
+    public File getProjectRoot() {
         return projectRoot.getValue();
     }
 
-    public void setProjectRoot(Path projectRoot) {
+    public void setProjectRoot(File projectRoot) {
         this.projectRoot.setValue(projectRoot);
     }
 
-    public Property<Path> projectRootProperty() {
+    public Property<File> projectRootProperty() {
         return projectRoot;
     }
 

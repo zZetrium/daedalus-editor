@@ -51,7 +51,7 @@ public class App extends Application {
     public void start(Stage stage) {
         App.stage = stage;
         Model m = new Model();
-        Controller c = new ControllerImplementation(m, null);
+        Controller c = new ControllerImplementation(m);
         try {
             scene = new Scene(Util.loadFXML("primary"));
         } catch (IOException ex) {

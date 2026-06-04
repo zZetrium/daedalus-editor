@@ -18,6 +18,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -33,9 +34,31 @@ public class PrimaryViewController {
 
 //    private ContextMenu fileMenu = Util.loadFXML("")
     @FXML
-    private TreeView<File> projectList;
+    private TreeView<Project> projectList;
 
-    public PrimaryViewController() {
+    @FXML
+    public void initialize() {
+        projectList.setCellFactory(treeItem -> {
+            return new TreeCell<>() {
+                @Override
+                protected void updateItem(File file, boolean empty) {
+                    super.updateItem(file, empty);
+                    if (empty || getTreeItem() == null || file == null) {
+                        setGraphic(null);
+                        return;
+                    }
+                    var item = getTreeItem();
+
+                    var icon = item.isLeaf() ? new FontIcon(MaterialDesignF.FILE) : new FontIcon(MaterialDesignF.FOLDER);
+                    var label = new Label(item.getValue().getName());
+                    setGraphic(new HBox(icon, label));
+                    getGraphic().setOnMouseClicked(evt -> {
+                        
+                    });
+                }
+
+            };
+        });
     }
 
     @FXML
@@ -48,6 +71,7 @@ public class PrimaryViewController {
         for (var f : selected) {
             projectList.getRoot().getChildren().add(createFileNode(f));
         }
+    
 
     }
 
@@ -67,8 +91,8 @@ public class PrimaryViewController {
     // anonymously, but this could be better abstracted by creating a
     // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
     // for the reader.
-    private TreeItem<File> createFileNode(final File f) {
-        return new TreeItem<File>(f) {
+    private TreeItem<Project> createFileNode(final File f) {
+        return new TreeItem<Project>(f) {
             // We cache whether the File is a leaf or not. A File is a leaf if
             // it is not a directory and does not have any files contained within
             // it. We cache this as isLeaf() is called often, and doing the
@@ -83,9 +107,10 @@ public class PrimaryViewController {
             // exercise for the reader.
             private boolean isFirstTimeChildren = true;
             private boolean isFirstTimeLeaf = true;
-            
+
             {
-                setGraphic(isLeaf()? new FontIcon(MaterialDesignF.FILE) : new FontIcon(MaterialDesignF.FOLDER));
+
+                //setGraphic(isLeaf()? new FontIcon(MaterialDesignF.FILE) : new FontIcon(MaterialDesignF.FOLDER));
             }
 
             @Override
@@ -104,7 +129,7 @@ public class PrimaryViewController {
             public boolean isLeaf() {
                 if (isFirstTimeLeaf) {
                     isFirstTimeLeaf = false;
-                    File f = (File) getValue();
+                    File f = getValue();
                     isLeaf = f.isFile();
                 }
 
@@ -129,14 +154,16 @@ public class PrimaryViewController {
                 return FXCollections.emptyObservableList();
             }
 
-         
         };
+    }
+
+    @FXML
+    private void pressTreeItem(MouseEvent evt) {
     }
 
     private static String stringifyPath(Path path) {
         return path.getFileName() != null ? path.getFileName().toString() : path.toString();
 
     }
-    
 
 }
