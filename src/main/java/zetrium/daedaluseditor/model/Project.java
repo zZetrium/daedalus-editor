@@ -26,7 +26,9 @@ package zetrium.daedaluseditor.model;
 import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -38,15 +40,19 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public class Project {
 
-    // platform specific path
-    //private final StringProperty path = new SimpleStringProperty();
-    private final transient ObjectProperty<File> projectRoot = new SimpleObjectProperty<>();
+    private Path rootFolder;
+    private ProjectNode root;
 
     public Project(String path) {
-        projectRoot.setValue(new File(path));
+        rootFolder = Path.of(path);
     }
+
+    public Project(Path path) {
+        rootFolder = path;
+    }
+
     public Project(File file) {
-        projectRoot.setValue(file);
+        rootFolder = file.toPath();
     }
 
     /*public static Project[] fromFiles(List<File> files) {
@@ -60,27 +66,50 @@ public class Project {
         }
         return projects;
     }*/
-
-
-    public String getPath() {
-        return projectRoot.get().getAbsolutePath();
+    public Path getRootFolder() {
+        return rootFolder;
     }
 
-    public File getProjectRoot() {
-        return projectRoot.getValue();
+    public void setRootFolder(Path path) {
+        this.rootFolder = path;
     }
 
-    public void setProjectRoot(File projectRoot) {
-        this.projectRoot.setValue(projectRoot);
+    public Project(Path rootFolder, ProjectNode root) {
+        this.rootFolder = rootFolder;
+        this.root = root;
     }
-
-    public Property<File> projectRootProperty() {
-        return projectRoot;
-    }
+    
+    
 
     @Override
     public String toString() {
-        return "Project: "+getPath();
+        return "Project: " + getRootFolder();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.rootFolder);
+        hash = 89 * hash + Objects.hashCode(this.root);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Project other = (Project) obj;
+        if (!Objects.equals(this.rootFolder, other.rootFolder)) {
+            return false;
+        }
+        return Objects.equals(this.root, other.root);
     }
     
     

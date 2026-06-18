@@ -6,12 +6,9 @@
                 <packaging>jar</packaging>
             </packagings>
             <goals>
-                <goal>clean</goal>
                 <goal>javafx:run</goal>
+                
             </goals>
-            <properties>
-                <exec.args>--enable-preview</exec.args>
-            </properties>
         </action>
         <action>
             <actionName>debug</actionName>

@@ -56,6 +56,9 @@ public class ControllerImplementation implements Controller {
     public ObservableList<Project> getProjects() {
         return m.getProjects();
     }
+    
+    public 
+    
 
     /*private Model model;
     private MessageDisplayer messageDisplayer;

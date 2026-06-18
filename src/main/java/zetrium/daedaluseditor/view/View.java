@@ -81,8 +81,8 @@ import javafx.util.Pair;
  * @author Tomáš Zídek
  */
 @Deprecated
-public class View implements MessageDisplayer {
-
+public class View   {
+/*
     private Stage stage;
     private Model model;
     private Controller controller;
@@ -125,6 +125,7 @@ public class View implements MessageDisplayer {
 
      */
     // private BorderPane borderPane;
+    /*
     public View(Stage stage, Model model, Controller controller) {
         this.model = model;
         this.controller = controller;
@@ -144,7 +145,7 @@ public class View implements MessageDisplayer {
         /*editorPane.selectionModelProperty().addListener((ObservableValue<? extends SingleSelectionModel<Tab>> observable, SingleSelectionModel<Tab> oldValue, SingleSelectionModel<Tab> newValue) -> {
             selected = new Pair<>(((FileTab)newValue.getSelectedItem()).getFileState(),(FileTab)newValue.getSelectedItem());
         });*/
-    }
+   /* }
 
     private void setupUI() {
 
@@ -236,7 +237,7 @@ public class View implements MessageDisplayer {
                 }
 
                 return FXCollections.emptyObservableList();*/
-                Path[] files = controller.listFiles(path);
+              /*  Path[] files = controller.listFiles(path);
                 ObservableList<TreeItem<Path>> children = FXCollections.observableArrayList();
 
                 for (Path childProjectNode : files) {
@@ -328,7 +329,7 @@ public class View implements MessageDisplayer {
             }
 
         });*/
-        projectList.setPrefWidth(250);
+      /*  projectList.setPrefWidth(250);
         VBox.setVgrow(projectList, Priority.ALWAYS);
 
         return projectList;
@@ -485,6 +486,6 @@ public class View implements MessageDisplayer {
     @Override
     public void showInformation(String message) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    }*/
 
 }

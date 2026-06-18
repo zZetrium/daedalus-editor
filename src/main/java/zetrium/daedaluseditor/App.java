@@ -46,14 +46,15 @@ public class App extends Application {
 
     private static Scene scene;
     private static Stage stage;
+    private static Model model;
 
     @Override
     public void start(Stage stage) {
         App.stage = stage;
-        Model m = new Model();
-        Controller c = new ControllerImplementation(m);
+        model = new Model();
+        Controller control = new ControllerImplementation(model);
         try {
-            scene = new Scene(Util.loadFXML("primary"));
+            scene = new Scene(Util.loadFXML("primary",a -> new PrimaryViewController(control)));
         } catch (IOException ex) {
             System.getLogger(App.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }

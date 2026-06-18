@@ -24,6 +24,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import zetrium.daedaluseditor.controller.Controller;
+import zetrium.daedaluseditor.model.Model;
 import zetrium.daedaluseditor.model.Project;
 
 /**
@@ -31,10 +33,17 @@ import zetrium.daedaluseditor.model.Project;
  * @author xzidek
  */
 public class PrimaryViewController {
+    
+    private Controller control;
+
+    public PrimaryViewController(Controller control) {
+        this.control = control;
+    }
+    
 
 //    private ContextMenu fileMenu = Util.loadFXML("")
     @FXML
-    private TreeView<Project> projectList;
+    private TreeView<File> projectList;
 
     @FXML
     public void initialize() {
@@ -53,7 +62,8 @@ public class PrimaryViewController {
                     var label = new Label(item.getValue().getName());
                     setGraphic(new HBox(icon, label));
                     getGraphic().setOnMouseClicked(evt -> {
-                        
+                        System.out.println("here");
+                        projectList.getSelectionModel().getSelectedItem().getValue();
                     });
                 }
 
@@ -71,7 +81,6 @@ public class PrimaryViewController {
         for (var f : selected) {
             projectList.getRoot().getChildren().add(createFileNode(f));
         }
-    
 
     }
 
@@ -91,8 +100,8 @@ public class PrimaryViewController {
     // anonymously, but this could be better abstracted by creating a
     // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
     // for the reader.
-    private TreeItem<Project> createFileNode(final File f) {
-        return new TreeItem<Project>(f) {
+    private TreeItem<File> createFileNode(final File f) {
+        return new TreeItem<File>(f) {
             // We cache whether the File is a leaf or not. A File is a leaf if
             // it is not a directory and does not have any files contained within
             // it. We cache this as isLeaf() is called often, and doing the
